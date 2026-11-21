@@ -1,0 +1,445 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>Glider – Anleitung</title>
+<!--
+  ANLEITUNG zum Ausdrucken (A4). Aufbau und Stil sind in jedem Lua gleich (bauplan.md, Abschnitt Anleitung):
+  Kapitel in dieser Reihenfolge lassen, Beispieltexte ersetzen, nichts Leeres stehen lassen.
+  PDF erzeugen: mit dem Anleitungs-Skript des Bausatzes
+  Danach jede Seite der PDF ansehen (Umbrüche, Bilder, Tabellen).
+  Nummern auf einem Bild: <span class="nr" style="left:12%;top:30%">1</span> innerhalb von <div class="bild">.
+-->
+<style>
+  @page { size: A4; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; line-height: 1.42; color: #1a1f2b; margin: 0; }
+  h1 { font-size: 24pt; margin: 0 0 2mm; }
+  h2 { font-size: 14.5pt; margin: 7mm 0 2.5mm; padding-bottom: 1mm; border-bottom: 1.5pt solid #1f4f96; color: #12305e; break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 4mm 0 1.5mm; break-after: avoid; }
+  p { margin: 0 0 2.5mm; }
+  ol, ul { margin: 0 0 2.5mm; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; break-inside: avoid; }
+  .unter { color: #56607a; font-size: 11pt; margin-bottom: 5mm; }
+  .bild { position: relative; width: 100%; margin: 3mm 0; break-inside: avoid; }
+  .bild img { width: 100%; display: block; border-radius: 2mm; border: 0.5pt solid #99a; }
+  .bild .t, .halb .t { font-size: 9pt; color: #56607a; margin-top: 1mm; }
+  .schmal { width: 58%; margin-left: auto; margin-right: auto; }
+  .halb { display: flex; gap: 5mm; width: 88%; margin-left: auto !important; margin-right: auto !important; break-inside: avoid; margin: 3mm 0; }
+  .halb > div { flex: 1; }
+  .halb img { width: 100%; display: block; border-radius: 1.5mm; border: 0.5pt solid #99a; }
+  .nr { position: absolute; width: 6.2mm; height: 6.2mm; margin: -3.1mm 0 0 -3.1mm; border-radius: 50%; background: #e11d48;
+        color: #fff; font-weight: 700; font-size: 9.5pt; line-height: 6.2mm; text-align: center; border: 0.6pt solid #fff; }
+  .n { display: inline-block; min-width: 5mm; height: 5mm; border-radius: 50%; background: #e11d48; color: #fff; font-weight: 700;
+       font-size: 8.5pt; line-height: 5mm; text-align: center; margin-right: 1mm; }
+  table { border-collapse: collapse; width: 100%; margin: 2mm 0 3mm; font-size: 9.6pt; }
+  tr { break-inside: avoid; }
+  th, td { border: 0.5pt solid #b6bccb; padding: 1.3mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #e9eef8; }
+  .kasten { border: 1pt solid #d99a00; background: #fff7df; border-radius: 2mm; padding: 2.5mm 3.5mm; margin: 3mm 0; break-inside: avoid; }
+  .kasten.blau { border-color: #1f4f96; background: #eef3fb; }
+  .gruen { color: #15803d; font-weight: 700; } .orange { color: #b45309; font-weight: 700; } .rot { color: #b91c1c; font-weight: 700; }
+  .haken { list-style: none; padding-left: 0; }
+  .haken li::before { content: "☐  "; font-size: 12pt; }
+  .neu { break-before: page; }
+  .klein { font-size: 9pt; color: #56607a; }
+</style>
+</head>
+<body>
+
+<h1>Glider</h1>
+<div class="unter">Flug-Anzeige für Segler und E-Segler · Anleitung · Version 0.5.0 · Stand 21.11.2026</div>
+
+<div class="bild schmal">
+  <img src="../bilder-simulator/Glider - Sim 800x480 04 Normal.png" alt="Glider auf dem Sender">
+</div>
+
+<p><b>Glider</b> ist eine Anzeige (ein «Widget») für FrSky-Sender mit Ethos und Farbdisplay. Sie zeigt auf einem ganzen
+Bildschirm Vario, Höhe, Flugzeit, Akkus und Empfang, erkennt Start, Ausklinkhöhe und Thermik und sagt sie an. Jeder Flug
+kommt in eine Liste mit Übersicht, und du wirst gewarnt, wenn Höhe, Akku oder Empfang eine eingestellte Grenze verlassen.</p>
+
+<div class="kasten">
+  <b>Stand der Erprobung (Version 0.5.0):</b> Zufallstest und 37 Abläufe im Ethos-Simulator (X18RS, Ethos 26.2.0)
+  fehlerfrei, auch Einstellungen und Flugliste nach einem Update. Vollbild 800 × 480 direkt getestet, 640 × 360, 480 × 320
+  und 480 × 272 nachgestellt; Kompaktansicht 784 × 316 direkt, 630 × 258 und 472 × 210 nachgestellt.
+  Am echten Sender (X18RS, Ethos 26.2.0): Start, drei Seiten und Ansagen (0.1.1), Sensorsuche mit 48 Sensoren und
+  Neuladen (0.1.3/0.1.4). <span id="sendertest">0.4.0 («Alarm auch bei Motor aus», Studio-Grenzen im Kreis) und 0.3.1 (Stumm, Antriebsakku, Sensorliste, Stücke, Speicher) bisher nur im Simulator. Lua-Studio (0.3.0) am Sender: Beispiel-Datei, kaputte Datei, Feldfehler, 10 Modellwechsel. Nur im Simulator: Änderungen im Menü (.funke.lua) und die volle Datei mit 16 Plätzen. 0.2.0: Kompaktansicht mit Live-Telemetrie, Update von 0.1.4 und die geänderte Suche. Der Thermik-Gewinn ist nur im Simulator getestet (er braucht einen erkannten Flug).</span>
+  <b>Noch nicht geprüft:</b> echter Flug, andere Sender als die X18RS (nur Simulator).
+</div>
+
+<h2>1. Was du brauchst</h2>
+<ul class="haken">
+  <li>Einen FrSky-Sender mit Ethos ab Version 26.1 und Farbdisplay (Liste in Kapitel 11).</li>
+  <li>Ein Modell, bei dem die Telemetrie läuft und die Sensoren schon gesucht sind (Modell › Telemetrie › Sensoren suchen).</li>
+  <li>Ein Vario mit Höhe und Steigen. Ohne Vario fehlen Flug, Ausklinkhöhe und Thermik.</li>
+  <li>Einen Computer mit der FrSky Suite und ein USB-Kabel.</li>
+  <li>Die Datei <code>Glider-0.5.0.zip</code>. Sie liegt neben dieser Anleitung in <code>Glider-0.5.0-share.zip</code>. Entpacke nur die äussere ZIP, die innere nicht.</li>
+</ul>
+
+<h2>2. Installieren</h2>
+<ol>
+  <li>Sender einschalten und mit dem USB-Kabel am Computer anschliessen.</li>
+  <li>Am Sender erscheint eine Auswahl. Wähle <b>Ethos Suite</b>.</li>
+  <li>Öffne am Computer die <b>FrSky Suite</b>. Der Sender wird oben angezeigt.</li>
+  <li>Klicke auf <b>Lua-Bibliothek</b>, dann auf <b>Von lokaler ZIP installieren</b>.</li>
+  <li>Wähle die Datei <code>Glider-0.5.0.zip</code>. Die Suite kopiert alles in den Ordner <code>scripts/glider/</code> auf dem Sender.</li>
+  <li>Ziehe das Kabel ab und starte den Sender neu.</li>
+</ol>
+<p class="klein">Ohne Suite: Sender als «USB-Speicher» anschliessen und den Ordner <code>glider</code> aus der ZIP in den
+Ordner <code>scripts</code> des Senders kopieren. Einen vorhandenen Ordner überschreiben, nicht löschen.</p>
+
+<h2>3. Bildschirm einrichten</h2>
+<p>Das Widget braucht einen ganzen Bildschirm. Es gibt zwei passende Layouts, das Widget erkennt selbst, welches du gewählt hast:</p>
+<ul>
+  <li><b>Vollbild</b> (ein einziges grosses Feld ohne Leisten): drei Seiten mit allen Werten (Kapitel 5).</li>
+  <li><b>Ein Feld mit Kopf- und Fussleiste</b>: die <b>Kompaktansicht</b> mit den wichtigsten Werten auf einen Blick,
+  oben bleiben Modellname und Senderakku von Ethos sichtbar (Kapitel 5, «Kompaktansicht»).</li>
+</ul>
+<p>In einem noch kleineren Feld steht nur «Feld zu klein».</p>
+<ol>
+  <li>Tippe unten auf das Symbol <b>Bildschirme</b> (zwei Rechtecke).</li>
+  <li>Tippe oben rechts auf <b>+</b>.</li>
+  <li>Wische nach unten bis zum Layout <b>Vollbild</b> (ein einziges grosses Feld) oder <b>ein Feld mit Kopf- und Fussleiste</b> und tippe es an.</li>
+  <li>Tippe in das leere Feld, dann auf <b>Widget</b>.</li>
+  <li>Wähle in der Liste <b>Glider</b>. Das Feld zeigt jetzt die Anzeige, ohne Telemetrie mit Strichen.</li>
+</ol>
+<div class="halb">
+  <div><img src="../bilder-simulator/Glider - Sim 800x480 01 Widget-Liste.png" alt="Widget-Liste"><div class="t">Glider in der Liste der Widgets</div></div>
+  <div><img src="../bilder-simulator/Glider - Sim 800x480 03 ohne Telemetrie.png" alt="ohne Telemetrie"><div class="t">Ohne Telemetrie: grau «KEINE DATEN», Striche statt Zahlen</div></div>
+</div>
+<p>Das Menü des Widgets (alle Einstellungen) öffnest du später jederzeit über Modell › Bildschirme › Bildschirm wählen › Widget antippen.</p>
+
+<h2>4. Sensoren zuweisen</h2>
+<p>Beim ersten Start sucht das Widget die Sensoren selbst, sobald Telemetrie da ist. Oben im blauen Balken erscheint für 3 s
+«… Sensoren automatisch zugewiesen». Kontrolliere trotzdem jede Zeile:</p>
+<ol>
+  <li>Schalte das Modell ein, damit die Telemetrie läuft.</li>
+  <li>Öffne das Menü des Widgets. Tippe bei <b>Sensoren suchen (nur leere)</b> auf <b>Suchen</b>. Die Suche läuft nach dem Schliessen des Menüs in wenigen Sekunden; das Ergebnis steht dann blau oben auf der Anzeige. Gesucht werden nur Zeilen, die noch leer sind.</li>
+  <li>Unter jedem gefundenen Sensor steht <b>ID</b> (Physical ID) und <b>AppID</b>. So unterscheidest du Sensoren mit gleichem Namen. Steht dort «n Sensoren passen, gewählt: … – bitte prüfen», hat das Lua von mehreren passenden Sensoren einen gewählt (zuerst einen mit Wert, sonst den mit der kleinsten Nummer). Prüfe dann, ob es der richtige ist.</li>
+  <li>Öffne die Gruppen <b>Sensoren</b>, <b>Akkus</b> und <b>Startart und Ausklinkhöhe</b> und kontrolliere jede Zeile. Was leer oder falsch ist, wählst du von Hand.</li>
+</ol>
+<table>
+  <tr><th>Zeile im Menü</th><th>Was gehört hinein</th><th>Sucht automatisch nach</th></tr>
+  <tr><td>Höhe</td><td>Höhe vom Vario in m</td><td>«Alt», nicht GPS</td></tr>
+  <tr><td>Vario</td><td>Steigen und Sinken in m/s</td><td>«VSpd», «Vario»</td></tr>
+  <tr><td>Empfang (RSSI/LQ)</td><td>Empfangsqualität in %</td><td>«RSSI», «LQ»</td></tr>
+  <tr><td>Geschwindigkeit</td><td>Fahrt (nur für Kachel und Leiste)</td><td>«Speed», «GSpd», «ASpd»</td></tr>
+  <tr><td>Akku 1 Sensor</td><td>Empfängerakku (ab Werk Rolle «Empfänger»)</td><td>«RxBt»</td></tr>
+  <tr><td>Akku 2 Sensor</td><td>Antriebsakku (ab Werk Rolle «Antrieb»)</td><td>«VFAS», «LiPo», «Cels»</td></tr>
+  <tr><td>Akku 3 Sensor</td><td>ein weiterer Akku (Rolle «Akku»)</td><td>–</td></tr>
+  <tr><td>Antrieb: Akku-% Sensor / Verbrauch / Strom</td><td>Werte vom Regler</td><td>«Fuel», «Capa», «Curr»</td></tr>
+  <tr><td>Schleppkupplung</td><td>Schalter der Schleppkupplung</td><td>Schalter <b>SH</b></td></tr>
+  <tr><td>Motor aus (Schalter)</td><td>Schalter, mit dem du den Motor sperrst</td><td>Schalter <b>SF</b></td></tr>
+  <tr><td>Gas (Geber oder Kanal)</td><td>Gasgeber, z. B. der Schieber links</td><td>«S1» (Schieber links)</td></tr>
+  <tr><td>Höhe ansagen (Schalter)</td><td>Taster oder Schalter für die Höhenansage</td><td>Schalter <b>SG</b></td></tr>
+</table>
+<h3>Akku mit Zellensensor oder nur Gesamtspannung</h3>
+<p>Im Menü steht je Akku die Zeile «Akku 1 erkannt» mit «Zellensensor» oder «Gesamtspannung».
+Mit einem <b>Zellensensor</b> (z. B. FrSky FLVSS) misst das Widget jede Zelle und zeigt sie als Balken; es warnt nach der tiefsten Zelle.
+Kommt <b>nur die Gesamtspannung</b>, stell bei <b>Akku 1 Zellen</b> (bzw. 2, 3) die Zellenzahl ein, z. B. <b>3S</b>. Dann rechnet
+das Widget mit der mittleren Zelle (Gesamtspannung geteilt durch Zellenzahl). Steht die Zellenzahl auf «automatisch», steht
+in Menü und Anzeige «Zellenzahl einstellen», und für diesen Akku gibt es keine Zellwarnung.</p>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 15 Elektrik nur Gesamtspannung.png" alt="nur Gesamtspannung">
+<div class="t">Nur Gesamtspannung, Zellenzahl noch nicht eingestellt</div></div>
+<p>Wähle auch <b>Akku 1 Art</b> (LiPo, LiFe, NiMH). Beim Wechsel der Art setzt das Menü die Zellgrenzen dieses Akkus neu:
+LiPo 3,50 / 3,30 V, LiFe 3,10 / 2,90 V, NiMH 1,15 / 1,05 V (Warnung / Alarm).</p>
+
+<h2 class="neu">5. Die Anzeige</h2>
+<p>Die Anzeige hat drei Seiten: <b>Flug</b>, <b>Elektrik</b> und <b>Flüge</b>. Du blätterst mit einem Wisch nach links oder
+rechts oder mit dem Drehrad. Welche Seite beim Start kommt, stellst du bei «Startseite» ein.</p>
+<h3>Seite 1: Flug</h3>
+<div class="bild">
+  <img src="../bilder-simulator/Glider - Sim 800x480 04 Normal.png" alt="Anzeige mit Nummern">
+  <span class="nr" style="left:2%;top:4%">1</span>
+  <span class="nr" style="left:16.5%;top:4%">2</span>
+  <span class="nr" style="left:41%;top:4%">3</span>
+  <span class="nr" style="left:72%;top:4%">4</span>
+  <span class="nr" style="left:3%;top:20%">5</span>
+  <span class="nr" style="left:40.5%;top:20%">6</span>
+  <span class="nr" style="left:71.5%;top:20%">7</span>
+  <span class="nr" style="left:3%;top:62%">8</span>
+  <span class="nr" style="left:3%;top:89%">9</span>
+</div>
+<table>
+  <tr><th style="width:9mm">Nr.</th><th style="width:34mm">Was du siehst</th><th>Was es bedeutet</th></tr>
+  <tr><td><span class="n">1</span></td><td>Zustand</td><td><span class="gruen">OK</span> = alles in Ordnung. <span class="orange">WARNUNG</span> = ein Wert hat die erste Grenze verlassen. <span class="rot">ALARM</span> = ein Wert hat die zweite Grenze verlassen. Grau «KEINE DATEN» = keine Telemetrie.</td></tr>
+  <tr><td><span class="n">2</span></td><td>Flugphase</td><td>Name der aktiven Flugphase aus dem Modell. Die Zeit je Phase steht in der Flugliste.</td></tr>
+  <tr><td><span class="n">3</span></td><td>Motor</td><td>Nur bei Modellart «E-Segler». «MOTOR AUS» = Schalter «Motor aus» ist aktiv. «MOTOR EIN» = freigegeben, Gas unter der Schwelle. «MOTOR LÄUFT» = freigegeben und Gas ab «Motor läuft ab Gas» (ab Werk 10 %).</td></tr>
+  <tr><td><span class="n">4</span></td><td>Empfang, Seite</td><td>Empfangsqualität in % und die Seite, z. B. «Flug 1/3».</td></tr>
+  <tr><td><span class="n">5</span></td><td>Kachel 1 (ab Werk VARIO)</td><td>Steigen in m/s (grün) oder Sinken (rot), Balken links bis zur «Vario-Skala ±». Darunter «Mittel 20 s» und «Höchst».</td></tr>
+  <tr><td><span class="n">6</span></td><td>Kachel 2 (ab Werk HÖHE)</td><td>Höhe vom Vario in m. Darunter «Höchst» dieses Flugs und die «Ausklinkhöhe» (Kapitel 7).</td></tr>
+  <tr><td><span class="n">7</span></td><td>Kachel 3 (ab Werk FLUGZEIT)</td><td>Zeit seit dem erkannten Start in Minuten:Sekunden, darunter die Zeit in der aktuellen Phase und die Motorlaufzeit.</td></tr>
+  <tr><td><span class="n">8</span></td><td>Verlauf</td><td>«VARIO-VERLAUF 2 MIN»: Steigen und Sinken der letzten 2 Minuten als Säulen. Die gestrichelte Linie ist die «Thermik-Schwelle». Mit «Verlauf» stellst du Vario, Höhe oder aus ein.</td></tr>
+  <tr><td><span class="n">9</span></td><td>Leiste unten</td><td>Drei frei wählbare Felder, ab Werk Empfänger (Spannung), Antrieb (% / Spannung) und Empfang (%).</td></tr>
+</table>
+<p>Ein kurzer grauer Strich statt einer Zahl heisst: Dieser Wert kommt gerade nicht an oder ist keinem Sensor zugewiesen.
+Ein blauer Balken unter der Kopfzeile meldet ein Ereignis, z. B. «THERMIK +2,4 m/s» oder «AUSKLINKHÖHE 285 m».</p>
+
+<h3>Kompaktansicht (Layout mit Kopf- und Fussleiste)</h3>
+<div class="bild schmal" style="width:70%"><img src="../bilder-simulator/Glider - Sim 784x316 20 Kompakt E-Segler.png" alt="Kompaktansicht">
+<div class="t">Kompaktansicht auf X20 und X18RS (784 × 316). X14: 630 × 258, X18 und Twin X Lite: 472 × 210.</div></div>
+<table>
+  <tr><th style="width:34mm">Teil</th><th>Was es zeigt</th></tr>
+  <tr><td>Leiste oben</td><td>Flugzeit, Zustand (OK / WARNUNG / ALARM), Motor (nur E-Segler), Flugphase und rechts der Empfang. Bei einer Warnung oder einem Hinweis (z. B. «THERMIK +2,4 m/s») steht dort die Meldung.</td></tr>
+  <tr><td>Ring Vario</td><td>Steigen grün nach rechts, Sinken blau nach links, voll bei der «Vario-Skala ±».</td></tr>
+  <tr><td>Ring Höhe</td><td>Höhe; der Ring ist voll beim Höhenalarm, ohne Höhenalarm beim nächsten Hunderter über der höchsten Höhe.</td></tr>
+  <tr><td>Ring Antriebsakku</td><td>Akku in % und darunter die Spannung. Beim reinen Segler ohne Antriebsakku steht hier der Empfang.</td></tr>
+  <tr><td>Ring Empfängerakku</td><td>Spannung und darunter %.</td></tr>
+  <tr><td>8 Felder</td><td>Flugphase mit Zeit, Ausklinkhöhe, höchste Höhe, Ø Steigen 20 s, Geschwindigkeit, Strom, Verbrauch und Thermik-Gewinn (Kapitel 7).</td></tr>
+</table>
+<p>Die Seiten Elektrik und Flüge gibt es nur im Vollbild. Alle Warnungen und Ansagen arbeiten in beiden Ansichten gleich.</p>
+<h3>Seite 2: Elektrik</h3>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 14 Elektrik.png" alt="Elektrik"></div>
+<p>Links der Antriebsakku: Akku-% gross, daneben die Gesamtspannung, darunter ein Balken je Zelle mit der Zellspannung in V
+(nur mit Zellensensor). Unten Verbrauch und Strom; die letzte Zeile sagt, woher die % kommen («Akku-% vom Regler»,
+«Akku-% aus Verbrauch» oder «Akku-% aus Spannung»). Rechts oben der Empfängerakku mit Spannung und «Tiefst»,
+rechts unten der Empfang in % mit dem tiefsten Wert. Oben rechts in jeder Akku-Kachel stehen Zellenzahl und Art, z. B. «3S LiPo».</p>
+
+<h3>Seite 3: Flüge</h3>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 16 Fluege.png" alt="Flüge"></div>
+<p>Links «GESAMT»: Anzahl Flüge, Flugzeit gesamt, höchste Höhe, höchste Ausklinkhöhe, höchstes Steigen und Sinken,
+längster Flug und Motor gesamt, alles seit dem letzten Zurücksetzen. Rechts «FLÜGE»: jeder Flug mit Dauer, Startart
+(Schlepp, E-Start, Hand/Winde) und Ausklinkhöhe, darunter der Durchschnitt pro Flug. Höchstens 40 Flüge werden
+gespeichert; danach fällt der älteste weg. Tippe einen Flug an, um seine Werte zu sehen (Kapitel 7).</p>
+
+<h2>6. Warnungen und Alarme</h2>
+<p>Jeder überwachte Wert hat zwei Grenzen. Du stellst sie in Kapitel 8 ein. Steht eine Grenze auf 0, ist sie ausgeschaltet.</p>
+<table>
+  <tr><th>Wert</th><th>Warnung (orange)</th><th>Alarm (rot)</th><th>Text oben</th></tr>
+  <tr><td>Höhe</td><td>über «Höhe Warnung über» (ab Werk 0 = aus)</td><td>über «Höhe Alarm über» (ab Werk 0 = aus)</td><td>HÖHE 412 m</td></tr>
+  <tr><td>Antriebsakku in %</td><td>unter «Antrieb % Warn. unter» (30 %)</td><td>unter «Antrieb % Alarm unter» (20 %)</td><td>ANTRIEBSAKKU 18 %</td></tr>
+  <tr><td>Tiefste Zelle je Akku</td><td>unter «Akku 1 Zelle Warn. unter»</td><td>unter «Akku 1 Zelle Alarm unter»</td><td>EMPFÄNGERAKKU TIEF, ANTRIEBSAKKU, AKKU TIEF</td></tr>
+  <tr><td>Zellen ungleich</td><td>Unterschied über «Zellenunterschied über» (0,15 V)</td><td>–</td><td>ZELLENUNTERSCHIED</td></tr>
+  <tr><td>Empfang</td><td>unter «Empfang Warnung unter» (0 = aus)</td><td>unter «Empfang Alarm unter» (0 = aus)</td><td>EMPFANG SCHWACH</td></tr>
+  <tr><td>Telemetrie</td><td>war da und ist ausgefallen</td><td>–</td><td>TELEMETRIE WEG</td></tr>
+</table>
+<p class="klein">Der Antriebsakku wird bei jeder Modellart überwacht, sobald ihm ein Sensor zugewiesen ist. Die Zellgrenzen der drei Akkus hängen von der Akkuart ab (Kapitel 4).</p>
+<div class="halb">
+  <div><img src="../bilder-simulator/Glider - Sim 800x480 05 Warnung.png" alt="Warnung"><div class="t">Warnung: orange, ab Werk nur Anzeige</div></div>
+  <div><img src="../bilder-simulator/Glider - Sim 800x480 06 Alarm.png" alt="Alarm"><div class="t">Alarm: rot, Ton und Ansage, Vibration</div></div>
+</div>
+<p><b>Wann es kommt und geht:</b> Eine Warnung erscheint, wenn der Wert 1 Sekunde lang ausserhalb der Grenze liegt, und
+verschwindet, wenn er 3 Sekunden lang wieder gut ist. So flackert sie nicht. Nach dem Einschalten des Modells bleibt
+alles während der «Startsperre» (ab Werk 10 s) still, damit Werte beim Anstecken keinen Alarm auslösen.</p>
+<p><b>Was du hörst:</b> Bei einem Alarm sagt der Sender den Text und, mit «Wert mit ansagen», die Zahl, z. B.
+«Achtung! Antriebsakku leer» und «18 Prozent». Dazu vibriert er. Die Ansage kommt alle «Wiederholung alle»
+(ab Werk 30 s) wieder, solange der Alarm besteht. Warnungen werden nur mit «Warnung auch ansagen» angesagt.
+Zwischen zwei Ansagen liegen mindestens 3 Sekunden; Alarme gehen vor. Mit dem Schalter «Stumm (Schalter)» bleiben
+Ereignisse und Warnungen still; rote Alarme kommen trotzdem, die Anzeige bleibt. Liegen «Stumm» und «Motor aus» auf
+demselben Schalter, zeigt das Widget-Menü oben den Hinweis «Stumm = Motor aus: nur Alarme hörbar».</p>
+<p>Ganz still wird ein Alarm nur, wenn du ihn ausschaltest. Ab 0.4.0 lässt sich je Wert wählen, ob der Alarm auch bei
+Motor aus kommt (Menügruppe «Alarm auch bei Motor aus», ab Werk ein). Ist der Haken weg und steht der Schalter
+«Motor aus» auf «Motor aus bei», bleibt dieser Alarm still; die Farbe der Anzeige bleibt. Dieselbe Einstellung kann
+auch aus Lua-Studio kommen (<code>beiMotorAus</code>).</p>
+<table>
+  <tr><th>Anlass</th><th>Ansage</th></tr>
+  <tr><td>Höhe Warnung / Alarm</td><td>«Höhe» / «Achtung! Höhe» + Zahl</td></tr>
+  <tr><td>Antriebsakku Warnung / Alarm</td><td>«Antriebsakku tief» / «Achtung! Antriebsakku leer» + Prozent</td></tr>
+  <tr><td>Empfängerakku Warnung / Alarm</td><td>«Empfängerakku tief» / «Achtung! Empfängerakku leer»</td></tr>
+  <tr><td>Akku mit Rolle «Akku»</td><td>«Akku tief» / «Achtung! Akku leer»</td></tr>
+  <tr><td>Zellenunterschied</td><td>«Zellen ungleich»</td></tr>
+  <tr><td>Empfang Warnung / Alarm</td><td>«Empfang schwach» / «Achtung! Empfang schwach» + Prozent</td></tr>
+  <tr><td>Telemetrie fällt aus</td><td>«Telemetrie weg»</td></tr>
+</table>
+
+<h2>7. Bedienen</h2>
+<h3>Flug, Ausklinkhöhe und Thermik</h3>
+<p><b>Start:</b> Ein Flug beginnt, wenn die Höhe über «Flug beginnt ab Höhe» (10 m) steigt oder der Motor läuft.
+<b>Ende:</b> Er endet, wenn die Höhe unter «Flug endet unter Höhe» (5 m) liegt, das Vario ruhig ist (weniger als 0,5 m/s)
+und der Motor steht, und zwar während «und ruhig während» (10 s). Dann steht oben im blauen Balken «Flug 3 gespeichert» und
+der Sender sagt «Flug gespeichert». Flüge kürzer als «Kürzere Flüge weglassen» (30 s) kommen nicht in die Liste.</p>
+<p><b>Ausklinkhöhe:</b> Bei «Ausklinkhöhe aus» = «automatisch» gilt je Startart:</p>
+<table>
+  <tr><th>Startart</th><th>Ausklinkhöhe ist die Höhe …</th></tr>
+  <tr><td>Schlepp</td><td>wenn der Schalter «Schleppkupplung» in die Stellung «Ausgeklinkt bei» (ab Werk unten) geht.</td></tr>
+  <tr><td>E-Start (nur E-Segler)</td><td>wenn der Motor aufhört zu laufen (Schalter «Motor aus» oder Gas unter der Schwelle).</td></tr>
+  <tr><td>Hand/Winde</td><td>am höchsten Punkt, wenn das Modell danach «Höchster Punkt nach Sinken» (3 s) lang sinkt und höher als 10 m war.</td></tr>
+</table>
+<p>Mit «Schleppkupplung», «Motor aus» oder «höchster Punkt» zählt nur diese eine Art. Die Höhe steht im blauen Balken,
+in der Kachel HÖHE und in der Flugliste; der Sender sagt «Ausklinkhöhe» und die Zahl.</p>
+<p><b>Thermik:</b> Steigt das Modell während «während» (3 s) mit mindestens «Ansage ab Steigen» (1,0 m/s) und läuft der
+Motor nicht, erscheint «THERMIK +1,4 m/s» und der Sender sagt «Thermik». Danach ist für «danach Ruhe» (30 s) still.</p>
+<p><b>Thermik-Gewinn:</b> Ab dem Moment, in dem das Steigen begonnen hat, zählt das Widget die gewonnene Höhe und die Zeit,
+z. B. «+85 m 1:22» (grün, solange die Thermik läuft). Die Thermik endet, wenn das Mittel über 20 s unter 0 fällt oder der
+Motor läuft; der Wert bleibt bis zur nächsten Thermik stehen. Du siehst ihn in der Kompaktansicht und im Vollbild, wenn du
+eine Kachel oder ein Feld der Leiste auf «Thermik-Gewinn» stellst.</p>
+<p><b>Höhe und Flugzeit ansagen:</b> Schalter «Höhe ansagen (Schalter)» umlegen: Der Sender sagt «Höhe» und die Zahl.
+Mit «Höhe ansagen alle» bzw. «Flugzeit ansagen alle» kommt die Ansage regelmässig.</p>
+
+<h3>Einen Flug ansehen oder löschen</h3>
+<ol>
+  <li>Blättere zur Seite <b>Flüge</b> und tippe einen Flug an. Du siehst Startart, Ausklinkhöhe, höchste Höhe, Steigen/Sinken, Flugzeit, Motorlaufzeit, tiefste Empfängerspannung und die Zeit je Flugphase.</li>
+  <li>Tippe auf <b>FLUG 2 LÖSCHEN</b>. Es erscheint «Flug 2 löschen?».</li>
+  <li>Tippe auf <b>JA, LÖSCHEN</b>. Die späteren Flüge rücken eine Nummer nach. Mit <b>ABBRECHEN</b> bleibt alles. <b>SCHLIESSEN</b> führt zurück zur Liste.</li>
+</ol>
+<div class="halb">
+  <div><img src="../bilder-simulator/Glider - Sim 800x480 17 Detail.png" alt="Detail"><div class="t">Werte eines Flugs</div></div>
+  <div><img src="../bilder-simulator/Glider - Sim 800x480 18 Detail Rueckfrage Flug loeschen.png" alt="Rückfrage"><div class="t">Rückfrage vor dem Löschen</div></div>
+</div>
+<h3>Übersicht zurücksetzen</h3>
+<ol>
+  <li>Tippe auf der Seite Flüge auf <b>ÜBERSICHT ZURÜCKSETZEN</b>. Es erscheint «Übersicht zurücksetzen?» und «Gesamtwerte und alle Flüge werden gelöscht.».</li>
+  <li>Tippe auf <b>JA, ZURÜCKSETZEN</b>. Oben im blauen Balken steht «Übersicht zurückgesetzt». Mit <b>ABBRECHEN</b> bleibt alles.</li>
+</ol>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 07 Rueckfrage.png" alt="Rückfrage"></div>
+<h3>Ohne Berührung (X14, X10, X12) und über das Menü</h3>
+<p>Die Seiten blätterst du mit dem Drehrad. Alles, was Daten löscht, geht über Knöpfe oben im Menü des Widgets; jeder
+Knopf öffnet dieselbe Rückfrage wie oben:</p>
+<table>
+  <tr><th>Zeile im Menü</th><th>Knopf</th><th>Was passiert</th></tr>
+  <tr><td>Flug löschen (Nr.)</td><td>Löschen</td><td>Nummer wählen, dann «Flug … löschen?» mit JA, LÖSCHEN.</td></tr>
+  <tr><td>Flug jetzt beenden</td><td>Beenden</td><td>«Flug jetzt beenden?» – mit JA, BEENDEN kommt der laufende Flug sofort in die Liste.</td></tr>
+  <tr><td>Übersicht und Flüge</td><td>Zurücksetzen</td><td>«Übersicht zurücksetzen?» mit JA, ZURÜCKSETZEN.</td></tr>
+</table>
+
+<h2 class="neu">8. Alle Einstellungen</h2>
+<p>Menü öffnen: Modell › Bildschirme › den Bildschirm wählen › Widget antippen. Jede Änderung gilt sofort und bleibt
+für dieses Modell gespeichert. «–» bei «Ab Werk» heisst: leer, wird gesucht oder von Hand gewählt.</p>
+<table>
+  <tr><th style="width:23mm">Gruppe</th><th style="width:47mm">Einstellung</th><th style="width:24mm">Ab Werk</th><th>Bereich und Wirkung</th></tr>
+  <tr><td>Modell</td><td>Modellart</td><td>Segler</td><td>Segler oder E-Segler. Nur E-Segler zeigt den Motor. Den Antriebsakku überwachen beide, sobald ein Sensor zugewiesen ist.</td></tr>
+  <tr><td rowspan="4">Sensoren</td><td>Höhe</td><td>–</td><td rowspan="4">Siehe Kapitel 4.</td></tr>
+  <tr><td>Vario</td><td>–</td></tr>
+  <tr><td>Empfang (RSSI/LQ)</td><td>–</td></tr>
+  <tr><td>Geschwindigkeit</td><td>–</td></tr>
+  <tr><td rowspan="16">Akkus</td><td>Akku 1 / 2 / 3 Sensor</td><td>–</td><td>Spannungssensor oder Zellensensor des Akkus.</td></tr>
+  <tr><td>Akku 1 / 2 / 3 ist</td><td>Empfänger / Antrieb / Akku</td><td>Rolle: Empfänger, Antrieb oder Akku. Bestimmt Platz, Text und Ansage.</td></tr>
+  <tr><td>Akku 1 / 2 / 3 Zellen</td><td>automatisch</td><td>automatisch oder 1S bis 12S. Bei nur Gesamtspannung einstellen, z. B. 3S.</td></tr>
+  <tr><td>Akku 1 / 2 / 3 Art</td><td>LiFe / LiPo / LiPo</td><td>LiPo, LiFe, NiMH. Setzt beim Wechsel die zwei Zellgrenzen dieses Akkus.</td></tr>
+  <tr><td>Akku 1 Zelle Warn. unter</td><td>3,10 V</td><td rowspan="6">0 bis 5,00 V je Zelle (0 = aus). Unter der Warnung orange, unter dem Alarm rot mit Ansage.</td></tr>
+  <tr><td>Akku 1 Zelle Alarm unter</td><td>2,90 V</td></tr>
+  <tr><td>Akku 2 Zelle Warn. unter</td><td>3,50 V</td></tr>
+  <tr><td>Akku 2 Zelle Alarm unter</td><td>3,30 V</td></tr>
+  <tr><td>Akku 3 Zelle Warn. unter</td><td>3,50 V</td></tr>
+  <tr><td>Akku 3 Zelle Alarm unter</td><td>3,30 V</td></tr>
+  <tr><td>Zellenunterschied über</td><td>0,15 V</td><td>0 bis 1,00 V. Unterschied zwischen höchster und tiefster Zelle (nur mit Zellensensor).</td></tr>
+  <tr><td>Antrieb: Akku-% aus</td><td>Regler-Sensor</td><td>Regler-Sensor, Verbrauch + Kapazität oder Spannung.</td></tr>
+  <tr><td>Antrieb: Akku-% Sensor</td><td>–</td><td>Sensor mit Akku-% vom Regler.</td></tr>
+  <tr><td>Antrieb: Verbrauch</td><td>–</td><td>Verbrauchte mAh vom Regler.</td></tr>
+  <tr><td>Antrieb: Strom</td><td>–</td><td>Strom vom Regler in A.</td></tr>
+  <tr><td>Antrieb: Kapazität</td><td>0 mAh</td><td>0 bis 20000 mAh, Schritt 50. Für «Verbrauch + Kapazität», z. B. 2200 mAh.</td></tr>
+  <tr><td rowspan="6">Grenzwerte (0 = aus)</td><td>Höhe Warnung über</td><td>0 m</td><td>0 bis 2000 m, Schritt 10. Beispiel: 300 m.</td></tr>
+  <tr><td>Höhe Alarm über</td><td>0 m</td><td>0 bis 2000 m, Schritt 10. Beispiel: 400 m.</td></tr>
+  <tr><td>Antrieb % Warn. unter</td><td>30 %</td><td>0 bis 100 %.</td></tr>
+  <tr><td>Antrieb % Alarm unter</td><td>20 %</td><td>0 bis 100 %.</td></tr>
+  <tr><td>Empfang Warnung unter</td><td>0</td><td>0 bis 100. Beispiel: 50.</td></tr>
+  <tr><td>Empfang Alarm unter</td><td>0</td><td>0 bis 100. Beispiel: 35.</td></tr>
+  <tr><td rowspan="8">Startart und Ausklinkhöhe</td><td>Ausklinkhöhe aus</td><td>automatisch</td><td>automatisch, Schleppkupplung, Motor aus, höchster Punkt (Kapitel 7).</td></tr>
+  <tr><td>Schleppkupplung</td><td>– (sucht SH)</td><td>Schalter der Schleppkupplung.</td></tr>
+  <tr><td>Ausgeklinkt bei</td><td>unten</td><td>oben, Mitte, unten: Stellung, in der ausgeklinkt ist.</td></tr>
+  <tr><td>Motor aus (Schalter)</td><td>– (sucht SF)</td><td>Schalter, der den Motor sperrt.</td></tr>
+  <tr><td>Motor aus bei</td><td>oben</td><td>oben, Mitte, unten: Stellung, in der der Motor aus ist.</td></tr>
+  <tr><td>Gas (Geber oder Kanal)</td><td>– (sucht S1)</td><td>Gasgeber oder Kanal.</td></tr>
+  <tr><td>Motor läuft ab Gas</td><td>10 %</td><td>0 bis 100 %. Ab dieser Gasstellung gilt der Motor als laufend.</td></tr>
+  <tr><td>Höchster Punkt nach Sinken</td><td>3 s</td><td>1 bis 10 s Sinken, bis der höchste Punkt als Ausklinkhöhe gilt.</td></tr>
+  <tr><td rowspan="4">Flug erkennen</td><td>Flug beginnt ab Höhe</td><td>10 m</td><td>1 bis 100 m.</td></tr>
+  <tr><td>Flug endet unter Höhe</td><td>5 m</td><td>0 bis 50 m.</td></tr>
+  <tr><td>und ruhig während</td><td>10 s</td><td>3 bis 60 s.</td></tr>
+  <tr><td>Kürzere Flüge weglassen</td><td>30 s</td><td>0 bis 300 s, Schritt 5.</td></tr>
+  <tr><td rowspan="3">Thermik</td><td>Ansage ab Steigen</td><td>1,0 m/s</td><td>0,1 bis 5,0 m/s. Auch die gestrichelte Linie im Verlauf.</td></tr>
+  <tr><td>während</td><td>3 s</td><td>1 bis 10 s.</td></tr>
+  <tr><td>danach Ruhe</td><td>30 s</td><td>10 bis 300 s, Schritt 5.</td></tr>
+  <tr><td rowspan="3">Schalter in der Statusleiste</td><td>Schalter 1 / 2</td><td>–</td><td>Schalter, dessen Stellung angezeigt wird.</td></tr>
+  <tr><td>Schalter 1 / 2 Name</td><td>leer</td><td>Text, höchstens 12 Zeichen, z. B. «Klappen».</td></tr>
+  <tr><td>Schalter 1 / 2 umkehren</td><td>aus</td><td>Ein: Anzeige umgekehrt.</td></tr>
+  <tr><td rowspan="5">Ansagen</td><td>Ausklinkhöhe ansagen</td><td>ein</td><td>«Ausklinkhöhe» + Zahl.</td></tr>
+  <tr><td>Thermik ansagen</td><td>ein</td><td>«Thermik».</td></tr>
+  <tr><td>Höhe ansagen (Schalter)</td><td>– (sucht SG)</td><td>Beim Umlegen: «Höhe» + Zahl.</td></tr>
+  <tr><td>Höhe ansagen alle</td><td>0 s</td><td>0 bis 600 s, Schritt 10 (0 = aus). Beispiel: 60 s.</td></tr>
+  <tr><td>Flugzeit ansagen alle</td><td>0 min</td><td>0 bis 30 min (0 = aus). «Flugzeit» + Minuten.</td></tr>
+  <tr><td rowspan="7">Warnungen</td><td>Ton und Ansage bei Alarm</td><td>ein</td><td>Aus: Alarme werden nur noch angezeigt.</td></tr>
+  <tr><td>Warnung auch ansagen</td><td>aus</td><td>Ein: Auch die orange Warnung wird angesagt.</td></tr>
+  <tr><td>Wert mit ansagen</td><td>ein</td><td>Nach dem Text folgt die Zahl, z. B. «18 Prozent».</td></tr>
+  <tr><td>Vibration bei Alarm</td><td>ein</td><td>Der Sender vibriert bei jedem Alarm.</td></tr>
+  <tr><td>Wiederholung alle</td><td>30 s</td><td>5 bis 600 s, Schritt 5. So oft kommt dieselbe Ansage wieder.</td></tr>
+  <tr><td>Startsperre</td><td>10 s</td><td>0 bis 120 s. So lange nach Beginn der Telemetrie keine Warnung.</td></tr>
+  <tr><td>Stumm (Schalter)</td><td>–</td><td>Aktiv: keine Ansagen und Töne, ausser roten Alarmen.</td></tr>
+  <tr><td rowspan="7">Alarm auch bei Motor aus</td><td>Höhe</td><td>ein</td><td rowspan="7">Ein: der Alarm kommt immer. Aus: solange der Schalter «Motor aus» auf «Motor aus bei» steht, bleibt dieser Alarm still (keine Meldung, kein Ton, keine Ansage, keine Vibration); die Farbe der Anzeige bleibt.</td></tr>
+  <tr><td>Antrieb %</td><td>ein</td></tr>
+  <tr><td>Empfang</td><td>ein</td></tr>
+  <tr><td>Akku 1 Zelle</td><td>ein</td></tr>
+  <tr><td>Akku 2 Zelle</td><td>ein</td></tr>
+  <tr><td>Akku 3 Zelle</td><td>ein</td></tr>
+  <tr><td>Zellenunterschied</td><td>ein</td></tr>
+  <tr><td rowspan="11">Anzeige</td><td>Sprache / Language</td><td>wie der Sender</td><td>wie der Sender, Deutsch, English. Gilt für Anzeige, Menü und Ansagen; das Menü wechselt beim nächsten Öffnen.</td></tr>
+  <tr><td>Startseite</td><td>1</td><td>1, 2 oder 3.</td></tr>
+  <tr><td>Kachel 1</td><td>Vario</td><td rowspan="3">Vario, Höhe, Flugzeit, Antriebsakku, Empfängerakku, Empfang, Geschwindigkeit, Thermik-Gewinn.</td></tr>
+  <tr><td>Kachel 2</td><td>Höhe</td></tr>
+  <tr><td>Kachel 3</td><td>Flugzeit</td></tr>
+  <tr><td>Verlauf</td><td>Vario</td><td>aus, Vario, Höhe.</td></tr>
+  <tr><td>Verlauf Dauer</td><td>2 min</td><td>1 min, 2 min, 5 min.</td></tr>
+  <tr><td>Leiste unten Feld 1</td><td>Empfängerakku</td><td rowspan="3">leer oder wie bei den Kacheln.</td></tr>
+  <tr><td>Leiste unten Feld 2</td><td>Antriebsakku</td></tr>
+  <tr><td>Leiste unten Feld 3</td><td>Empfang</td></tr>
+  <tr><td>Vario-Skala ±</td><td>5 m/s</td><td>2 bis 10 m/s. Endwert des Vario-Balkens.</td></tr>
+</table>
+
+<h2>9. Wenn etwas nicht geht</h2>
+<table>
+  <tr><th>Was du siehst</th><th>Ursache</th><th>Was du tust</th></tr>
+  <tr><td>Oben grau «KEINE DATEN», überall Striche</td><td>Keine Telemetrie</td><td>Modell einschalten. Prüfen, ob der Empfänger verbunden ist.</td></tr>
+  <tr><td>Oben orange «TELEMETRIE WEG»</td><td>Die Telemetrie war da und ist ausgefallen</td><td>Empfänger und Abstand prüfen. Die Meldung geht 3 s nachdem wieder Werte kommen.</td></tr>
+  <tr><td>Ein einzelner Wert zeigt einen Strich</td><td>Sensor nicht zugewiesen oder liefert nichts</td><td>Menü › Sensoren bzw. Akkus: Zeile kontrollieren (Kapitel 4).</td></tr>
+  <tr><td>«Zellenzahl einstellen» in der Akku-Kachel</td><td>Nur Gesamtspannung, Zellenzahl auf «automatisch»</td><td>Menü › Akkus › «Akku 1 Zellen» auf die richtige Zahl stellen, z. B. 3S.</td></tr>
+  <tr><td>Flugzeit läuft nicht, keine Flüge in der Liste</td><td>Höhe fehlt oder Flug kürzer als 30 s</td><td>Sensor «Höhe» prüfen; «Kürzere Flüge weglassen» kleiner stellen.</td></tr>
+  <tr><td>Ausklinkhöhe bleibt «–»</td><td>Schalter nicht zugewiesen oder falsche Stellung</td><td>«Schleppkupplung» und «Ausgeklinkt bei» bzw. «Motor aus (Schalter)» prüfen.</td></tr>
+  <tr><td>Motor zeigt nie «MOTOR LÄUFT»</td><td>Gas nicht zugewiesen («S1» nicht gefunden)</td><td>«Gas (Geber oder Kanal)» von Hand wählen.</td></tr>
+  <tr><td>Bei Alarm nur ein Ton statt einer Stimme</td><td>Sprachdateien fehlen im Ordner <code>scripts/glider/audio/</code></td><td>Glider über die Suite neu installieren; das Paket enthält die Ansagen.</td></tr>
+  <tr><td>Gar kein Ton bei Alarm</td><td>Ansagen aus oder Lautstärke 0 (der Stumm-Schalter lässt rote Alarme durch)</td><td>«Ton und Ansage bei Alarm» einschalten, Stumm-Schalter prüfen, Lautstärke am Sender prüfen.</td></tr>
+  <tr><td>Auf dem Bildschirm steht «Feld zu klein»</td><td>Das Feld ist zu klein (Layout mit mehreren Feldern)</td><td>Layout <b>Vollbild</b> oder <b>ein Feld mit Kopf- und Fussleiste</b> wählen (Kapitel 3).</td></tr>
+  <tr><td>Unten links steht roter Text</td><td>Fehler im Skript. Der Sender läuft normal weiter.</td><td>Text abfotografieren und als Issue im Repo melden (siehe Testleitfaden).</td></tr>
+  <tr><td>Das Widget fehlt in der Liste</td><td>Nicht installiert oder Sender nicht neu gestartet</td><td>Kapitel 2 wiederholen, Sender neu starten.</td></tr>
+</table>
+
+<h2>10. Aktualisieren und Entfernen</h2>
+<div class="kasten"><b>Neuer Name ab 0.5.0:</b> Segler heisst jetzt <b>Glider</b> (Ordner <code>scripts/glider</code>, Studio-Datei <code><i>Kennung</i>.glider.lua</code>). Das ist nicht rückwärts verträglich: In jedem Modell das Widget Glider neu wählen und neu einrichten; die Einstellungen des alten Widgets werden nicht übernommen. Studio-Dateien aus Lua-Studio neu übertragen oder umbenennen; eine alte <code><i>Kennung</i>.segler.lua</code> wird gelesen, solange keine neue da ist. Danach kann der alte Ordner <code>scripts/segler</code> gelöscht werden.</div>
+<p><b>Aktualisieren:</b> Die neue ZIP genau wie in Kapitel 2 installieren. Die Suite ersetzt nur das Programm. Deine
+Einstellungen, Sensoren und die Flugliste bleiben erhalten (Ordner <code>daten/</code> im Skriptordner).</p>
+<div class="bild schmal" style="width:40%"><img src="../bilder-simulator/Glider - Sim 800x480 19 nach Update-Neustart.png" alt="nach Update">
+<div class="t">Nach Update und Neustart: Einstellungen und Flüge sind noch da</div></div>
+<p><b>Entfernen:</b> Zuerst das Widget vom Bildschirm nehmen (Modell › Bildschirme), dann in der FrSky Suite unter Lua-Bibliothek deinstallieren.</p>
+
+<h2>11. Welche Sender</h2>
+<table>
+  <tr><th>Display</th><th>Sender</th><th>Stand</th></tr>
+  <tr><td>800 × 480, Berührung</td><td>X20, X20S, X20HD, X20 Pro, X20R, X20RS, X18R, X18RS</td><td>im Simulator getestet; X18RS: am Sender getestet (siehe Stand der Erprobung)</td></tr>
+  <tr><td>640 × 360, ohne Berührung</td><td>Twin X14, X14S</td><td>im Simulator nachgestellt</td></tr>
+  <tr><td>480 × 320, Berührung</td><td>X18, X18S, X18SE, Twin X Lite, Twin X Lite S</td><td>im Simulator nachgestellt</td></tr>
+  <tr><td>480 × 272, ohne Berührung</td><td>X10, X10S, X10 Express, X12S mit Ethos</td><td>im Simulator nachgestellt; Grösse der Kompaktansicht nicht gemessen</td></tr>
+</table>
+<h2 class="neu">12. Lua-Studio: eigene Anzeige je Modell</h2>
+<p>Mit dem PC-Programm <b>Lua-Studio</b> gestaltest du die Anzeige für jedes Modell selbst: welcher Wert wo steht, als Zahl,
+Ring, Balken (waagrecht oder senkrecht), Kurve oder Zustand, mit eigenen Farben, Grenzen und Einstellungen. Das Studio
+schreibt dafür eine Datei je Modell auf den Sender, z. B. <code>scripts/studio/M__we_2.glider.lua</code>. Der erste Teil ist die Kennung des Modells: der Modellname, in dem jedes Zeichen ausser A–Z, a–z und 0–9 zu «_» wird. Ein Umlaut zählt als zwei Zeichen und wird zu «__» (aus «Möwe 2» wird «M__we_2»). Länger als 32 Zeichen wird gekürzt. Ohne diese
+Datei arbeitet Glider genau wie bisher.</p>
+<div class="halb">
+  <div><img src="../bilder-simulator/Glider - Sim 784x316 33 Studio Beispiel.png" alt="Studio kompakt"><div class="t">Eigene Belegung in der Kompaktansicht</div></div>
+  <div><img src="../bilder-simulator/Glider - Sim 800x480 34 Studio Beispiel.png" alt="Studio Vollbild"><div class="t">Eigene Belegung im Vollbild (ersetzt Seite 1)</div></div>
+</div>
+<ul>
+  <li><b>Wo es gilt:</b> Die Datei kann je eine Anordnung für die Kompaktansicht und für das Vollbild enthalten. Passt die Grösse
+  genau zum Bildschirm, zeichnet Glider sie. Im Vollbild ersetzt sie nur Seite 1. Elektrik und Flüge bleiben, ebenso die
+  Leiste oben.</li>
+  <li><b>Grenzen:</b> Warnung und Alarm gelten je Wert für das ganze Modell, egal wie und wie oft der Wert angezeigt wird.
+  Fehlt in der Datei eine Grenze, gilt die Grenze ab Werk. Auch Sensoren und Kanäle können Grenzen haben, sie melden sich mit
+  einem Ton.</li>
+  <li><b>Ändern am Sender:</b> Änderungen im Widget-Menü gehen in eine eigene Datei <code>…glider.funke.lua</code>, die
+  Studio-Datei bleibt unverändert. Im Menü steht oben «Studio-Datei: geladen». <b>Zurück auf Studio-Stand</b> verwirft die
+  Änderungen am Sender. Ohne Studio-Datei heisst der Knopf <b>Zurück auf Standard</b> und setzt alle Einstellungen auf die
+  Werte ab Werk (Sensoren und Schalter bleiben).</li>
+  <li><b>Für das Studio</b> schreibt Glider nach jedem Modellwechsel eine Info-Datei (<code>…glider.info.json</code>) mit
+  Modell, Sender, Fenstergrössen und der Sensorliste.</li>
+</ul>
+<table>
+  <tr><th>Hinweis unten (8 s, danach «!» oben rechts)</th><th>Bedeutung</th><th>Was du tust</th></tr>
+  <tr><td>«Studio-Datei kaputt - Standard»</td><td>Die Datei ist beschädigt oder unerlaubt. Glider arbeitet wie ohne Studio.</td><td>Im Studio neu auf den Sender übertragen.</td></tr>
+  <tr><td>«Studio-Datei zu neu - Lua aktualisieren»</td><td>Das Studio hat ein neueres Format geschrieben.</td><td>Glider aktualisieren (Kapitel 10).</td></tr>
+  <tr><td>«Studio-Datei: 3 Fehler»</td><td>Einzelne Angaben waren ungültig. Für sie gilt der Standard, der Rest wirkt.</td><td>Im Studio prüfen und neu übertragen.</td></tr>
+  <tr><td>«Änderungen an der Funke verworfen»</td><td>Die Datei mit den Änderungen am Sender war beschädigt.</td><td>Änderungen im Menü neu machen.</td></tr>
+  <tr><td>«Änderung nicht gespeichert»</td><td>Die Änderung im Menü konnte nicht geschrieben werden (SD-Karte voll oder schreibgeschützt).</td><td>SD-Karte prüfen.</td></tr>
+</table>
+
+<p class="klein">Glider Version 0.5.0 · 21.11.2026</p>
+
+</body>
+</html>

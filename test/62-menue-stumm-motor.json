@@ -1,0 +1,48 @@
+{
+ "skripte": [
+  [
+   "src/glider",
+   "glider"
+  ]
+ ],
+ "widget": "glider",
+ "abbild": false,
+ "ersetze": [
+  [
+   "scripts/glider/kern.lua",
+   "local TEST = nil",
+   "local TEST = { zustand = true, cfg = { modell = 2, sprache = 1, sperre = 0, stumm = system.getSource({ category = CATEGORY_SWITCH_POSITION, member = 17 }), swMotor = system.getSource({ category = CATEGORY_SWITCH, member = 5 }) } }"
+  ],
+  [
+   "scripts/glider/kern.lua",
+   "  local ok, n = pcall(model.name)\n",
+   "  local ok, n = true, \"SEGLER DEMO\"   -- Test: neutraler Modellname\n"
+  ]
+ ],
+ "schritte": [
+  {
+   "zustand": {
+    "cfg": {
+     "stumm": "SF↓",
+     "swMotor": "SF"
+    }
+   },
+   "max": 8000
+  },
+  {
+   "taste": "DISP"
+  },
+  {
+   "tipp": [
+    400,
+    290
+   ]
+  },
+  {
+   "warte": 1500
+  },
+  {
+   "bild": "test/stand-bilder/roh-62 Menue Stumm gleich Motor.png"
+  }
+ ]
+}

@@ -1,0 +1,61 @@
+{
+ "skripte": [
+  [
+   "src/glider",
+   "glider"
+  ]
+ ],
+ "widget": "glider",
+ "abbild": false,
+ "ersetze": [
+  [
+   "scripts/glider/kern.lua",
+   "local TEST = nil",
+   "local TEST = { zustand = true, v = { h = 312, vs = 2.4, rssi = 92, pRegler = 62, gasP = 0, motorSw = true, ak = { [1] = { summe = 6.6, tief = 3.3, mittel = 3.3, n = 2, zellen = false, da = true }, [2] = { summe = 11.43, tief = 3.81, mittel = 3.81, n = 3, zellen = false, da = true } } }, cfg = { modell = 2, sprache = 1, sperre = 0, a1Rolle = 1, a1Typ = 2, a1S = 2, a2Rolle = 2, a2Typ = 1, a2S = 3 } }"
+  ],
+  [
+   "scripts/glider/kern.lua",
+   "  local ok, n = pcall(model.name)\n",
+   "  local ok, n = true, \"SEGLER DEMO\"   -- Test: neutraler Modellname\n"
+  ]
+ ],
+ "schritte": [
+  {
+   "drehe": 1
+  },
+  {
+   "warte": 300
+  },
+  {
+   "drehe": 1
+  },
+  {
+   "zustand": {
+    "zustand": "ok",
+    "seite": 2,
+    "cfg": {
+     "a2S": 3
+    },
+    "extra": {
+     "ak": [
+      {
+       "da": true
+      },
+      {
+       "zellen": false,
+       "summe": 11.43,
+       "tief": 3.81,
+       "n": 3
+      },
+      {
+       "da": false
+      }
+     ]
+    }
+   }
+  },
+  {
+   "bild": "docs/bilder-simulator/Glider - Sim 800x480 15 Elektrik nur Gesamtspannung.png"
+  }
+ ]
+}

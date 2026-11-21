@@ -1,0 +1,20 @@
+name: Feature request
+description: An idea or wish for Segler.
+title: "[Wish] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: wish
+    attributes:
+      label: What would you like?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why? What would it help with?
+  - type: input
+    id: radio
+    attributes:
+      label: Radio
+      description: e.g. X18RS

@@ -1,0 +1,46 @@
+{
+ "skripte": [
+  [
+   "src/glider",
+   "glider"
+  ]
+ ],
+ "widget": "glider",
+ "abbild": false,
+ "ersetze": [
+  [
+   "scripts/glider/kern.lua",
+   "local TEST = nil",
+   "local TEST = { zustand = true }"
+  ],
+  [
+   "scripts/glider/felder.lua",
+   "  return \"daten/\" .. p .. \".txt\"",
+   "  return \"daten/test.txt\""
+  ],
+  [
+   "scripts/glider/kern.lua",
+   "  local ok, n = pcall(model.name)\n",
+   "  local ok, n = true, \"SEGLER DEMO\"   -- Test: neutraler Modellname\n"
+  ]
+ ],
+ "grundstand": "test/stand-mit-werten",
+ "schritte": [
+  {
+   "zustand": {
+    "gelesen": true,
+    "cfg": {
+     "hAlarm": 400,
+     "modell": 2,
+     "a2S": 3
+    },
+    "extra": {
+     "nListe": 2
+    }
+   }
+  },
+  {
+   "bild": "docs/bilder-simulator/Glider - Sim 800x480 10 nach Neustart.png"
+  }
+ ]
+}

@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Glider – Manual</title>
+<!--
+  ANLEITUNG zum Ausdrucken (A4). Aufbau und Stil sind in jedem Lua gleich (bauplan.md, Abschnitt Anleitung):
+  Kapitel in dieser Reihenfolge lassen, Beispieltexte ersetzen, nichts Leeres stehen lassen.
+  PDF: built with the manual script of the build kit
+  Danach jede Seite der PDF ansehen (Umbrüche, Bilder, Tabellen).
+  Nummern auf einem Bild: <span class="nr" style="left:12%;top:30%">1</span> innerhalb von <div class="bild">.
+-->
+<style>
+  @page { size: A4; margin: 16mm; }
+  * { box-sizing: border-box; }
+  body { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 10.5pt; line-height: 1.42; color: #1a1f2b; margin: 0; }
+  h1 { font-size: 24pt; margin: 0 0 2mm; }
+  h2 { font-size: 14.5pt; margin: 7mm 0 2.5mm; padding-bottom: 1mm; border-bottom: 1.5pt solid #1f4f96; color: #12305e; break-after: avoid; }
+  h3 { font-size: 11.5pt; margin: 4mm 0 1.5mm; break-after: avoid; }
+  p { margin: 0 0 2.5mm; }
+  ol, ul { margin: 0 0 2.5mm; padding-left: 6mm; }
+  li { margin-bottom: 1.2mm; break-inside: avoid; }
+  .unter { color: #56607a; font-size: 11pt; margin-bottom: 5mm; }
+  .bild { position: relative; width: 100%; margin: 3mm 0; break-inside: avoid; }
+  .bild img { width: 100%; display: block; border-radius: 2mm; border: 0.5pt solid #99a; }
+  .bild .t, .halb .t { font-size: 9pt; color: #56607a; margin-top: 1mm; }
+  .schmal { width: 58%; margin-left: auto; margin-right: auto; }
+  .halb { display: flex; gap: 5mm; width: 88%; margin-left: auto !important; margin-right: auto !important; break-inside: avoid; margin: 3mm 0; }
+  .halb > div { flex: 1; }
+  .halb img { width: 100%; display: block; border-radius: 1.5mm; border: 0.5pt solid #99a; }
+  .nr { position: absolute; width: 6.2mm; height: 6.2mm; margin: -3.1mm 0 0 -3.1mm; border-radius: 50%; background: #e11d48;
+        color: #fff; font-weight: 700; font-size: 9.5pt; line-height: 6.2mm; text-align: center; border: 0.6pt solid #fff; }
+  .n { display: inline-block; min-width: 5mm; height: 5mm; border-radius: 50%; background: #e11d48; color: #fff; font-weight: 700;
+       font-size: 8.5pt; line-height: 5mm; text-align: center; margin-right: 1mm; }
+  table { border-collapse: collapse; width: 100%; margin: 2mm 0 3mm; font-size: 9.6pt; }
+  tr { break-inside: avoid; }
+  th, td { border: 0.5pt solid #b6bccb; padding: 1.3mm 2mm; text-align: left; vertical-align: top; }
+  th { background: #e9eef8; }
+  .kasten { border: 1pt solid #d99a00; background: #fff7df; border-radius: 2mm; padding: 2.5mm 3.5mm; margin: 3mm 0; break-inside: avoid; }
+  .kasten.blau { border-color: #1f4f96; background: #eef3fb; }
+  .gruen { color: #15803d; font-weight: 700; } .orange { color: #b45309; font-weight: 700; } .rot { color: #b91c1c; font-weight: 700; }
+  .haken { list-style: none; padding-left: 0; }
+  .haken li::before { content: "☐  "; font-size: 12pt; }
+  .neu { break-before: page; }
+  .klein { font-size: 9pt; color: #56607a; }
+</style>
+</head>
+<body>
+<h1>Glider</h1>
+<div class="unter">Flight display for gliders and electric gliders · Manual · Version 0.5.0 · 21 Nov 2026</div>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 12 Englisch.png" alt="Glider on the radio"></div>
+<p><b>Glider</b> is a display (a “widget”) for FrSky radios with Ethos and a colour screen. On a full screen it shows vario,
+altitude, flight time, batteries and link, detects launch, release height and thermals and announces them. Every flight
+goes into a list with a summary, and you are warned when altitude, battery or link leave a limit you set.</p>
+<div class="kasten"><b>Test status (version 0.5.0):</b> Random test and 37 test runs in the Ethos simulator (X18RS, Ethos 26.2.0)
+passed, including settings and flight list after an update. Full screen 800 × 480 tested directly, 640 × 360, 480 × 320 and
+480 × 272 simulated; compact view 784 × 316 directly, 630 × 258 and 472 × 210 simulated. On a real radio (X18RS, Ethos
+26.2.0): start, three pages and announcements (0.1.1), sensor search with 48 sensors and reload (0.1.3/0.1.4).
+<span id="sendertest">0.4.0 (“Alarm also with motor off”, studio limits in a ring) and 0.3.1 (mute, motor battery, sensor list, steps, memory) only in the simulator so far. Lua-Studio (0.3.0) on the radio: example file, broken file, field errors, 10 model changes. Simulator only: menu changes (.funke.lua) and the full file with 16 places. 0.2.0: compact view with live telemetry, update from 0.1.4 and the changed search. The thermal gain is tested in the simulator only (it needs a detected flight).</span>
+<b>Not yet tested:</b> real flight, radios other than the X18RS (simulator only).</div>
+
+<h2>1. What you need</h2>
+<ul class="haken">
+<li>A FrSky radio with Ethos 26.1 or newer and a colour screen (list in chapter 11).</li>
+<li>A model with working telemetry and sensors already discovered (Model › Telemetry › Discover new sensors).</li>
+<li>A vario with altitude and climb. Without a vario there is no flight detection, release height or thermal.</li>
+<li>A computer with FrSky Suite and a USB cable.</li>
+<li>The file <code>Glider-0.5.0.zip</code>. It is inside <code>Glider-0.5.0-share.zip</code> next to this manual. Unpack only the outer ZIP, not the inner one.</li>
+</ul>
+
+<h2>2. Install</h2>
+<ol>
+<li>Switch on the radio and connect it to the computer with the USB cable.</li>
+<li>The radio shows a choice. Select <b>Ethos Suite</b>.</li>
+<li>Open <b>FrSky Suite</b> on the computer. The radio appears at the top.</li>
+<li>Click <b>Lua-Bibliothek</b> (Lua library), then <b>Von lokaler ZIP installieren</b> (install from local ZIP).</li>
+<li>Select <code>Glider-0.5.0.zip</code>. The Suite copies everything into the folder <code>scripts/glider/</code> on the radio.</li>
+<li>Unplug the cable and restart the radio.</li>
+</ol>
+<p class="klein">Without the Suite: connect the radio as “USB storage” and copy the folder <code>glider</code> from the ZIP into the
+folder <code>scripts</code> on the radio. Overwrite an existing folder, do not delete it.</p>
+
+<h2>3. Set up the screen</h2>
+<p>The widget needs a whole screen. Two layouts fit; the widget detects by itself which one you chose:</p>
+<ul>
+<li><b>Full screen</b> (one single large frame without bars): three pages with all values (chapter 5).</li>
+<li><b>One frame with top and bottom bar</b>: the <b>compact view</b> with the key values at a glance; Ethos keeps showing
+model name and radio battery at the top (chapter 5, “Compact view”).</li>
+</ul>
+<p>In an even smaller frame it only shows “Area too small”.</p>
+<ol>
+<li>Tap the <b>Screens</b> icon at the bottom (two rectangles).</li>
+<li>Tap <b>+</b> at the top right.</li>
+<li>Scroll down to the layout <b>Full screen</b> (one single large frame) or <b>one frame with top and bottom bar</b> and tap it.</li>
+<li>Tap the empty frame, then <b>Widget</b>.</li>
+<li>Select <b>Glider</b> in the list. The frame now shows the display, without telemetry with dashes.</li>
+</ol>
+<div class="halb">
+<div><img src="../bilder-simulator/Glider - Sim 800x480 01 Widget-Liste.png" alt="widget list"><div class="t">Glider in the widget list</div></div>
+<div><img src="../bilder-simulator/Glider - Sim 800x480 03 ohne Telemetrie.png" alt="no telemetry"><div class="t">No telemetry: grey “NO DATA”, dashes instead of numbers (German pictures)</div></div>
+</div>
+<p>You open the widget menu (all settings) at any time via Model › Screens › select screen › tap the widget.</p>
+
+<h2>4. Assign sensors</h2>
+<p>On first start the widget looks for the sensors itself as soon as telemetry is present. The blue bar at the top shows for 3 s
+“… sensors assigned automatically”. Check every line anyway:</p>
+<ol>
+<li>Power up the model so telemetry is running.</li>
+<li>Open the widget menu. At <b>Find sensors (empty only)</b> tap <b>Search</b>. The search runs within a few seconds after you close the menu; the result then appears in blue at the top of the display. Only empty lines are searched.</li>
+  <li>Below every sensor found you see <b>ID</b> (Physical ID) and <b>AppID</b>, so sensors with the same name can be told apart. If it says “n sensors match, chosen: … - please check”, the Lua picked one of several matching sensors (first one with a value, otherwise the lowest number). Check that it is the right one.</li>
+<li>Open the groups <b>Sensors</b>, <b>Batteries</b> and <b>Launch and release height</b> and check every line. Select anything empty or wrong by hand.</li>
+</ol>
+<table><tr><th>Menu line</th><th>What belongs there</th><th>Searched automatically</th></tr>
+<tr><td>Altitude</td><td>Altitude from the vario in m</td><td>“Alt”, not GPS</td></tr>
+<tr><td>Vario</td><td>Climb and sink in m/s</td><td>“VSpd”, “Vario”</td></tr>
+<tr><td>Link (RSSI/LQ)</td><td>Link quality in %</td><td>“RSSI”, “LQ”</td></tr>
+<tr><td>Speed</td><td>Airspeed (only for tile and bar)</td><td>“Speed”, “GSpd”, “ASpd”</td></tr>
+<tr><td>Battery 1 sensor</td><td>Receiver battery (default role “Receiver”)</td><td>“RxBt”</td></tr>
+<tr><td>Battery 2 sensor</td><td>Motor battery (default role “Motor”)</td><td>“VFAS”, “LiPo”, “Cels”</td></tr>
+<tr><td>Battery 3 sensor</td><td>another battery (role “Battery”)</td><td>–</td></tr>
+<tr><td>Motor: battery % sensor / Motor: consumption / Motor: current</td><td>values from the ESC</td><td>“Fuel”, “Capa”, “Curr”</td></tr>
+<tr><td>Tow release</td><td>tow release switch</td><td>switch <b>SH</b></td></tr>
+<tr><td>Motor off (switch)</td><td>switch that locks the motor</td><td>switch <b>SF</b></td></tr>
+<tr><td>Throttle (control/ch.)</td><td>throttle control, e.g. the left slider</td><td>“S1” (left slider)</td></tr>
+<tr><td>Announce alt. (switch)</td><td>button or switch for the altitude call-out</td><td>switch <b>SG</b></td></tr>
+</table>
+<h3>Battery with cell sensor or total voltage only</h3>
+<p>For each battery the menu shows the line “Battery 1 detected” with “cell sensor” or “total voltage”.
+With a <b>cell sensor</b> (e.g. FrSky FLVSS) the widget measures every cell, shows it as a bar and warns by the lowest cell.
+With <b>total voltage only</b>, set <b>Battery 1 cells</b> (or 2, 3) to the cell count, e.g. <b>3S</b>. The widget then uses the
+average cell (total voltage divided by cell count). While the cell count is “automatic”, menu and display show “Set cell count”
+and there is no cell warning for this battery.</p>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 15 Elektrik nur Gesamtspannung.png" alt="total voltage only"><div class="t">Total voltage only, cell count not yet set (German picture)</div></div>
+<p>Also select <b>Battery 1 type</b> (LiPo, LiFe, NiMH). Changing the type resets the cell limits of this battery:
+LiPo 3.50 / 3.30 V, LiFe 3.10 / 2.90 V, NiMH 1.15 / 1.05 V (warning / alarm).</p>
+
+<h2 class="neu">5. The display</h2>
+<p>The display has three pages: <b>Flight</b>, <b>Power</b> and <b>Flights</b>. Swipe left or right or turn the rotary wheel to
+change page. “Start page” sets which page comes first.</p>
+<h3>Page 1: Flight</h3>
+<div class="bild">
+<img src="../bilder-simulator/Glider - Sim 800x480 12 Englisch.png" alt="display with numbers">
+<span class="nr" style="left:2%;top:4%">1</span><span class="nr" style="left:16.5%;top:4%">2</span>
+<span class="nr" style="left:41%;top:4%">3</span><span class="nr" style="left:60%;top:4%">4</span>
+<span class="nr" style="left:3%;top:20%">5</span><span class="nr" style="left:40.5%;top:20%">6</span>
+<span class="nr" style="left:71.5%;top:20%">7</span><span class="nr" style="left:3%;top:62%">8</span>
+<span class="nr" style="left:3%;top:89%">9</span>
+</div>
+<table><tr><th style="width:9mm">No.</th><th style="width:34mm">What you see</th><th>What it means</th></tr>
+<tr><td><span class="n">1</span></td><td>State</td><td><span class="gruen">OK</span> = all fine. <span class="orange">WARNING</span> = a value has passed the first limit. <span class="rot">ALARM</span> = a value has passed the second limit. Grey “NO DATA” = no telemetry. The bar below names the cause, here “ALTITUDE 152 m | MOTOR BATTERY 9 %”.</td></tr>
+<tr><td><span class="n">2</span></td><td>Flight mode</td><td>Name of the active flight mode of the model. Time per flight mode is in the flight list.</td></tr>
+<tr><td><span class="n">3</span></td><td>Motor</td><td>Only with model type “E-glider”. “MOTOR OFF” = switch “Motor off” is active. “MOTOR ON” = enabled, throttle below the threshold. “MOTOR RUN” = enabled and throttle at or above “Motor runs from throttle” (default 10 %).</td></tr>
+<tr><td><span class="n">4</span></td><td>Model, link, page</td><td>Model name (when there is room), link quality in % and the page, e.g. “Flight 1/3”.</td></tr>
+<tr><td><span class="n">5</span></td><td>Tile 1 (default VARIO)</td><td>Climb in m/s (green) or sink (red), bar on the left up to “Vario scale ±”. Below “Avg 20 s” and “Max”.</td></tr>
+<tr><td><span class="n">6</span></td><td>Tile 2 (default ALTITUDE)</td><td>Altitude from the vario in m. Below “Max” of this flight and “Release height” (chapter 7).</td></tr>
+<tr><td><span class="n">7</span></td><td>Tile 3 (default FLIGHT TIME)</td><td>Time since the detected launch in minutes:seconds, below the time in the current flight mode and the motor run time.</td></tr>
+<tr><td><span class="n">8</span></td><td>History</td><td>“VARIO HISTORY 2 MIN”: climb and sink of the last 2 minutes as columns. The dashed line is the “thermal threshold”. “History” selects vario, altitude or off.</td></tr>
+<tr><td><span class="n">9</span></td><td>Bottom bar</td><td>Three selectable fields, default Receiver (voltage), Motor batt. (% / voltage) and Link (%).</td></tr>
+</table>
+<p>A short grey dash instead of a number means: this value is not arriving or no sensor is assigned. A blue bar below the
+header reports an event, e.g. “THERMAL +2.4 m/s” or “RELEASE HEIGHT 285 m”.</p>
+<h3>Compact view (layout with top and bottom bar)</h3>
+<div class="bild schmal" style="width:70%"><img src="../bilder-simulator/Glider - Sim 472x210 22 Kompakt Englisch.png" alt="compact view">
+<div class="t">Compact view in English (472 × 210, X18 and Twin X Lite). X20 and X18RS: 784 × 316, X14: 630 × 258.</div></div>
+<table>
+<tr><th style="width:34mm">Part</th><th>What it shows</th></tr>
+<tr><td>Top bar</td><td>Flight time, state (OK / WARNING / ALARM), motor (electric glider only), flight mode and the link on the right. A warning or note (e.g. “THERMAL +2.4 m/s”) replaces these.</td></tr>
+<tr><td>Ring vario</td><td>Climb green to the right, sink blue to the left, full at “Vario scale ±”.</td></tr>
+<tr><td>Ring altitude</td><td>Altitude; the ring is full at the altitude alarm, without one at the next hundred above the highest altitude.</td></tr>
+<tr><td>Ring motor battery</td><td>Battery in % and the voltage below. On a pure glider without motor battery it shows the link.</td></tr>
+<tr><td>Ring receiver battery</td><td>Voltage and % below.</td></tr>
+<tr><td>8 fields</td><td>Flight mode with time, release height, max altitude, avg climb 20 s, speed, current, used and thermal gain (chapter 7).</td></tr>
+</table>
+<p>The pages Power and Flights exist in full screen only. All warnings and announcements work the same in both views.</p>
+<h3>Page 2: Power</h3>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 14 Elektrik.png" alt="Power"></div>
+<p>Left the motor battery: battery % large, next to it the total voltage, below one bar per cell with the cell voltage in V
+(cell sensor only). At the bottom used capacity and current; the last line tells where the % comes from (“% from ESC”,
+“% from used” or “% from voltage”). Top right the receiver battery with voltage and “Min”, bottom right the link in % with
+its lowest value. Each battery tile shows cell count and type at the top right, e.g. “3S LiPo”.</p>
+<h3>Page 3: Flights</h3>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 16 Fluege.png" alt="Flights"></div>
+<p>Left “TOTAL”: number of flights, total time, max altitude, max release, max climb and sink, longest flight and motor
+total, all since the last reset. Right “FLIGHTS”: each flight with duration, launch type (Tow, E-launch, Hand/winch) and
+release height, below the average per flight. Up to 40 flights are kept; after that the oldest drops out. Tap a flight to
+see its values (chapter 7).</p>
+
+<h2 class="neu">6. Warnings and alarms</h2>
+<p>Each monitored value has two limits. You set them in chapter 8. A limit set to 0 is off.</p>
+<table><tr><th>Value</th><th>Warning (orange)</th><th>Alarm (red)</th><th>Text at the top</th></tr>
+<tr><td>Altitude</td><td>above “Altitude warning above” (default 0 = off)</td><td>above “Altitude alarm above” (default 0 = off)</td><td>ALTITUDE 412 m</td></tr>
+<tr><td>Motor battery in %</td><td>below “Motor % warning below” (30 %)</td><td>below “Motor % alarm below” (20 %)</td><td>MOTOR BATTERY 18 %</td></tr>
+<tr><td>Lowest cell per battery</td><td>below “Batt. 1 cell warn below”</td><td>below “Batt. 1 cell alarm below”</td><td>RECEIVER BATTERY LOW, MOTOR BATTERY, BATTERY LOW</td></tr>
+<tr><td>Cells unbalanced</td><td>difference above “Cell difference above” (0.15 V)</td><td>–</td><td>CELL DIFFERENCE</td></tr>
+<tr><td>Link</td><td>below “Link warning below” (0 = off)</td><td>below “Link alarm below” (0 = off)</td><td>WEAK SIGNAL</td></tr>
+<tr><td>Telemetry</td><td>was present and is lost</td><td>–</td><td>TELEMETRY LOST</td></tr>
+</table>
+<p class="klein">The motor battery is monitored with every model type as soon as a sensor is assigned. The cell limits depend on the battery type (chapter 4).</p>
+<div class="halb">
+<div><img src="../bilder-simulator/Glider - Sim 800x480 05 Warnung.png" alt="warning"><div class="t">Warning: orange, by default display only</div></div>
+<div><img src="../bilder-simulator/Glider - Sim 800x480 06 Alarm.png" alt="alarm"><div class="t">Alarm: red, sound and voice, vibration</div></div>
+</div>
+<p><b>When it comes and goes:</b> A warning appears when the value has been outside the limit for 1 second and disappears
+when it has been fine again for 3 seconds. So it does not flicker. After the model is powered up, everything stays quiet
+during the “Start delay” (default 10 s), so plugging in does not trigger an alarm.</p>
+<p><b>What you hear:</b> On an alarm the radio says the text and, with “Announce value”, the number, e.g. “Warning! Motor
+battery empty” and “18 percent”. It also vibrates. The call repeats every “Repeat every” (default 30 s) as long as the alarm
+lasts. Warnings are only announced with “Announce warnings too”. There are at least 3 seconds between two
+announcements; alarms come first. With the switch “Mute (switch)” events and warnings stay silent; red alarms still sound, the display remains. If
+“Mute” and “Motor off” use the same switch, the widget menu shows the note “Mute = motor off: alarms only” at the top.</p>
+<p>An alarm is completely silent only when you switch it off. From 0.4.0 you can choose per value whether the alarm
+also sounds with the motor off (menu group “Alarm also with motor off”, on by default). Unticked, and with the switch
+“Motor off” at “Motor off at”, this alarm stays silent; the display keeps its colour. Lua-Studio can set the same
+(<code>beiMotorAus</code>).</p>
+<table><tr><th>Event</th><th>Announcement</th></tr>
+<tr><td>Altitude warning / alarm</td><td>“Altitude” / “Warning! Altitude” + number</td></tr>
+<tr><td>Motor battery warning / alarm</td><td>“Motor battery low” / “Warning! Motor battery empty” + percent</td></tr>
+<tr><td>Receiver battery warning / alarm</td><td>“Receiver battery low” / “Warning! Receiver battery empty”</td></tr>
+<tr><td>Battery with role “Battery”</td><td>“Battery low” / “Warning! Battery empty”</td></tr>
+<tr><td>Cell difference</td><td>“Cells unbalanced”</td></tr>
+<tr><td>Link warning / alarm</td><td>“Weak signal” / “Warning! Weak signal” + percent</td></tr>
+<tr><td>Telemetry lost</td><td>“Telemetry lost”</td></tr>
+</table>
+
+<h2>7. Operation</h2>
+<h3>Flight, release height and thermal</h3>
+<p><b>Start:</b> A flight begins when altitude rises above “Flight starts above” (10 m) or the motor runs.
+<b>End:</b> It ends when altitude is below “Flight ends below” (5 m), the vario is calm (less than 0.5 m/s) and the motor
+is stopped, for “and calm for” (10 s). Then the blue bar at the top shows “Flight 3 saved” and the radio says “Flight saved”.
+Flights shorter than “Skip flights shorter” (30 s) do not go into the list.</p>
+<p><b>Release height:</b> With “Release height from” = “automatic” it is per launch type:</p>
+<table><tr><th>Launch type</th><th>Release height is the altitude …</th></tr>
+<tr><td>Tow</td><td>when the switch “Tow release” moves to the position “Released at” (default down).</td></tr>
+<tr><td>E-launch (E-glider only)</td><td>when the motor stops running (switch “Motor off” or throttle below the threshold).</td></tr>
+<tr><td>Hand/winch</td><td>at the highest point, when the model then sinks for “Highest point after sink” (3 s) and was higher than 10 m.</td></tr>
+</table>
+<p>With “Tow release”, “Motor off” or “highest point” only that one type counts. The height shows in the blue bar, in the
+ALTITUDE tile and in the flight list; the radio says “Release height” and the number.</p>
+<p><b>Thermal:</b> When the model climbs at least “Announce from climb” (1.0 m/s) “for” (3 s) with the motor not running,
+“THERMAL +1.4 m/s” appears and the radio says “Thermal”. Then it stays quiet for “then quiet for” (30 s).</p>
+<p><b>Thermal gain:</b> From the moment the climb started, the widget counts the height gained and the time, e.g.
+“+85 m 1:22” (green while the thermal lasts). The thermal ends when the 20 s average drops below 0 or the motor runs; the
+value stays until the next thermal. You see it in the compact view, and in full screen when you set a tile or a bottom bar
+field to “Thermal gain”.</p>
+<p><b>Altitude and flight time call-outs:</b> Flip the switch “Announce alt. (switch)”: the radio says “Altitude” and the
+number. With “Announce alt. every” or “Announce time every” the call comes regularly.</p>
+<h3>View or delete a flight</h3>
+<ol>
+<li>Go to the page <b>Flights</b> and tap a flight. You see launch type, release height, max altitude, climb/sink, flight time, motor run time, lowest receiver voltage and time per flight mode.</li>
+<li>Tap <b>DELETE FLIGHT 2</b>. “Delete flight 2?” appears.</li>
+<li>Tap <b>YES, DELETE</b>. Later flights move up one number. With <b>CANCEL</b> nothing changes. <b>CLOSE</b> returns to the list.</li>
+</ol>
+<div class="halb">
+<div><img src="../bilder-simulator/Glider - Sim 800x480 17 Detail.png" alt="detail"><div class="t">Values of one flight (German picture)</div></div>
+<div><img src="../bilder-simulator/Glider - Sim 800x480 18 Detail Rueckfrage Flug loeschen.png" alt="question"><div class="t">Question before deleting</div></div>
+</div>
+<h3>Reset summary</h3>
+<ol>
+<li>On the page Flights tap <b>RESET SUMMARY</b>. “Reset summary?” and “Totals and all flights will be deleted.” appear.</li>
+<li>Tap <b>YES, RESET</b>. The blue bar at the top shows “Summary reset”. With <b>CANCEL</b> nothing changes.</li>
+</ol>
+<div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 13 Englisch Rueckfrage.png" alt="question"></div>
+<h3>Without touch (X14, X10, X12) and via the menu</h3>
+<p>Turn the rotary wheel to change pages. Everything that deletes data is also available as buttons at the top of the
+widget menu; each button opens the same question as above:</p>
+<table><tr><th>Menu line</th><th>Button</th><th>What happens</th></tr>
+<tr><td>Delete flight (no.)</td><td>Delete</td><td>Choose the number, then “Delete flight …?” with YES, DELETE.</td></tr>
+<tr><td>End flight now</td><td>End</td><td>“End flight now?” – with YES, END the current flight goes into the list at once.</td></tr>
+<tr><td>Summary and flights</td><td>Reset</td><td>“Reset summary?” with YES, RESET.</td></tr>
+</table>
+<h2 class="neu">8. All settings</h2>
+<p>Open the menu: Model › Screens › select the screen › tap the widget. Every change applies at once and is saved for this model. “–” under “Default” means empty, searched or selected by hand.</p>
+<table><tr><th style="width:23mm">Group</th><th style="width:47mm">Setting</th><th style="width:24mm">Default</th><th>Range and effect</th></tr>
+<tr><td rowspan="1">Model</td><td>Model type</td><td>Glider</td><td>Glider or E-glider. Only E-glider shows the motor. Both monitor the motor battery as soon as a sensor is assigned.</td></tr>
+<tr><td rowspan="4">Sensors</td><td>Altitude</td><td>–</td><td>See chapter 4.</td></tr>
+<tr><td>Vario</td><td>–</td><td>See chapter 4.</td></tr>
+<tr><td>Link (RSSI/LQ)</td><td>–</td><td>See chapter 4.</td></tr>
+<tr><td>Speed</td><td>–</td><td>See chapter 4.</td></tr>
+<tr><td rowspan="16">Batteries</td><td>Battery 1 / 2 / 3 sensor</td><td>–</td><td>Voltage sensor or cell sensor of the battery.</td></tr>
+<tr><td>Battery 1 / 2 / 3 is</td><td>Receiver / Motor / Battery</td><td>Role: Receiver, Motor or Battery. Sets place, text and announcement.</td></tr>
+<tr><td>Battery 1 / 2 / 3 cells</td><td>automatic</td><td>automatic or 1S to 12S. Set it with total voltage only, e.g. 3S.</td></tr>
+<tr><td>Battery 1 / 2 / 3 type</td><td>LiFe / LiPo / LiPo</td><td>LiPo, LiFe, NiMH. Changing it sets the two cell limits of this battery.</td></tr>
+<tr><td>Batt. 1 cell warn below</td><td>3.10 V</td><td>0 to 5.00 V per cell (0 = off).</td></tr>
+<tr><td>Batt. 1 cell alarm below</td><td>2.90 V</td><td>0 to 5.00 V per cell (0 = off).</td></tr>
+<tr><td>Batt. 2 cell warn below</td><td>3.50 V</td><td>0 to 5.00 V per cell (0 = off).</td></tr>
+<tr><td>Batt. 2 cell alarm below</td><td>3.30 V</td><td>0 to 5.00 V per cell (0 = off).</td></tr>
+<tr><td>Batt. 3 cell warn below</td><td>3.50 V</td><td>0 to 5.00 V per cell (0 = off).</td></tr>
+<tr><td>Batt. 3 cell alarm below</td><td>3.30 V</td><td>0 to 5.00 V per cell (0 = off).</td></tr>
+<tr><td>Cell difference above</td><td>0.15 V</td><td>0 to 1.00 V. Difference between highest and lowest cell (cell sensor only).</td></tr>
+<tr><td>Motor: battery % from</td><td>ESC sensor</td><td>ESC sensor, Used + capacity or Voltage.</td></tr>
+<tr><td>Motor: battery % sensor</td><td>–</td><td>Sensor with battery % from the ESC.</td></tr>
+<tr><td>Motor: consumption</td><td>–</td><td>Used mAh from the ESC.</td></tr>
+<tr><td>Motor: current</td><td>–</td><td>Current from the ESC in A.</td></tr>
+<tr><td>Motor: capacity</td><td>0 mAh</td><td>0 to 20000 mAh, step 50. For “Used + capacity”, e.g. 2200 mAh.</td></tr>
+<tr><td rowspan="6">Limits (0 = off)</td><td>Altitude warning above</td><td>0 m</td><td>0 to 2000 m, step 10. Example: 300 m.</td></tr>
+<tr><td>Altitude alarm above</td><td>0 m</td><td>0 to 2000 m, step 10. Example: 400 m.</td></tr>
+<tr><td>Motor % warning below</td><td>30 %</td><td>0 to 100 %.</td></tr>
+<tr><td>Motor % alarm below</td><td>20 %</td><td>0 to 100 %.</td></tr>
+<tr><td>Link warning below</td><td>0</td><td>0 to 100. Example: 50.</td></tr>
+<tr><td>Link alarm below</td><td>0</td><td>0 to 100. Example: 35.</td></tr>
+<tr><td rowspan="8">Launch and release height</td><td>Release height from</td><td>automatic</td><td>automatic, Tow release, Motor off, highest point (chapter 7).</td></tr>
+<tr><td>Tow release</td><td>– (searches SH)</td><td>Tow release switch.</td></tr>
+<tr><td>Released at</td><td>down</td><td>up, middle, down: position meaning released.</td></tr>
+<tr><td>Motor off (switch)</td><td>– (searches SF)</td><td>Switch that locks the motor.</td></tr>
+<tr><td>Motor off at</td><td>up</td><td>up, middle, down: position meaning motor off.</td></tr>
+<tr><td>Throttle (control/ch.)</td><td>– (searches S1)</td><td>Throttle control or channel.</td></tr>
+<tr><td>Motor runs from throttle</td><td>10 %</td><td>0 to 100 %. From this throttle position the motor counts as running.</td></tr>
+<tr><td>Highest point after sink</td><td>3 s</td><td>1 to 10 s of sinking until the highest point counts as release height.</td></tr>
+<tr><td rowspan="4">Flight detection</td><td>Flight starts above</td><td>10 m</td><td>1 to 100 m.</td></tr>
+<tr><td>Flight ends below</td><td>5 m</td><td>0 to 50 m.</td></tr>
+<tr><td>and calm for</td><td>10 s</td><td>3 to 60 s.</td></tr>
+<tr><td>Skip flights shorter</td><td>30 s</td><td>0 to 300 s, step 5.</td></tr>
+<tr><td rowspan="3">Thermal</td><td>Announce from climb</td><td>1.0 m/s</td><td>0.1 to 5.0 m/s. Also the dashed line in the history.</td></tr>
+<tr><td>for</td><td>3 s</td><td>1 to 10 s.</td></tr>
+<tr><td>then quiet for</td><td>30 s</td><td>10 to 300 s, step 5.</td></tr>
+<tr><td rowspan="3">Switches in status bar</td><td>Switch 1 / 2</td><td>–</td><td>Switch whose position is shown.</td></tr>
+<tr><td>Switch 1 / 2 name</td><td>empty</td><td>Text, up to 12 characters, e.g. “Flaps”.</td></tr>
+<tr><td>Switch 1 / 2 invert</td><td>off</td><td>On: display inverted.</td></tr>
+<tr><td rowspan="5">Announcements</td><td>Announce release height</td><td>on</td><td>“Release height” + number.</td></tr>
+<tr><td>Announce thermal</td><td>on</td><td>“Thermal”.</td></tr>
+<tr><td>Announce alt. (switch)</td><td>– (searches SG)</td><td>When flipped: “Altitude” + number.</td></tr>
+<tr><td>Announce alt. every</td><td>0 s</td><td>0 to 600 s, step 10 (0 = off). Example: 60 s.</td></tr>
+<tr><td>Announce time every</td><td>0 min</td><td>0 to 30 min (0 = off). “Flight time” + minutes.</td></tr>
+<tr><td rowspan="7">Warnings</td><td>Sound and voice on alarm</td><td>on</td><td>Off: alarms are only displayed.</td></tr>
+<tr><td>Announce warnings too</td><td>off</td><td>On: the orange warning is announced too.</td></tr>
+<tr><td>Announce value</td><td>on</td><td>The number follows the text, e.g. “18 percent”.</td></tr>
+<tr><td>Vibration on alarm</td><td>on</td><td>The radio vibrates on every alarm.</td></tr>
+<tr><td>Repeat every</td><td>30 s</td><td>5 to 600 s, step 5. How often the same call repeats.</td></tr>
+<tr><td>Start delay</td><td>10 s</td><td>0 to 120 s. No warning for this long after telemetry starts.</td></tr>
+<tr><td>Mute (switch)</td><td>–</td><td>Active: no announcements or tones, except red alarms.</td></tr>
+<tr><td rowspan="7">Alarm also with motor off</td><td>Altitude</td><td>on</td><td rowspan="7">On: the alarm always sounds. Off: while the switch “Motor off” is at “Motor off at”, this alarm stays silent (no message, tone, voice or vibration); the display keeps its colour.</td></tr>
+<tr><td>Motor %</td><td>on</td></tr>
+<tr><td>Link</td><td>on</td></tr>
+<tr><td>Battery 1 cell</td><td>on</td></tr>
+<tr><td>Battery 2 cell</td><td>on</td></tr>
+<tr><td>Battery 3 cell</td><td>on</td></tr>
+<tr><td>Cell difference</td><td>on</td></tr>
+<tr><td rowspan="11">Display</td><td>Sprache / Language</td><td>as the radio</td><td>as the radio, Deutsch, English. Applies to display, menu and announcements; the menu changes the next time it opens.</td></tr>
+<tr><td>Start page</td><td>1</td><td>1, 2 or 3.</td></tr>
+<tr><td>Tile 1</td><td>Vario</td><td>Vario, Altitude, Flight time, Motor battery, Receiver battery, Link, Speed, Thermal gain.</td></tr>
+<tr><td>Tile 2</td><td>Altitude</td><td>Vario, Altitude, Flight time, Motor battery, Receiver battery, Link, Speed, Thermal gain.</td></tr>
+<tr><td>Tile 3</td><td>Flight time</td><td>Vario, Altitude, Flight time, Motor battery, Receiver battery, Link, Speed, Thermal gain.</td></tr>
+<tr><td>History</td><td>Vario</td><td>off, Vario, Altitude.</td></tr>
+<tr><td>History length</td><td>2 min</td><td>1 min, 2 min, 5 min.</td></tr>
+<tr><td>Bottom bar field 1</td><td>Receiver battery</td><td>empty or as for the tiles.</td></tr>
+<tr><td>Bottom bar field 2</td><td>Motor battery</td><td>empty or as for the tiles.</td></tr>
+<tr><td>Bottom bar field 3</td><td>Link</td><td>empty or as for the tiles.</td></tr>
+<tr><td>Vario scale ±</td><td>5 m/s</td><td>2 to 10 m/s. End value of the vario bar.</td></tr>
+</table>
+<h2>9. Troubleshooting</h2>
+<table><tr><th>What you see</th><th>Cause</th><th>What to do</th></tr>
+<tr><td>Grey “NO DATA” at the top, dashes everywhere</td><td>No telemetry</td><td>Power up the model. Check the receiver is bound.</td></tr>
+<tr><td>Orange “TELEMETRY LOST” at the top</td><td>Telemetry was present and is lost</td><td>Check receiver and distance. The message goes 3 s after values return.</td></tr>
+<tr><td>A single value shows a dash</td><td>Sensor not assigned or not sending</td><td>Menu › Sensors or Batteries: check the line (chapter 4).</td></tr>
+<tr><td>“Set cell count” in the battery tile</td><td>Total voltage only, cell count “automatic”</td><td>Menu › Batteries › set “Battery 1 cells” to the right count, e.g. 3S.</td></tr>
+<tr><td>Flight time does not run, no flights in the list</td><td>Altitude missing or flight shorter than 30 s</td><td>Check sensor “Altitude”; lower “Skip flights shorter”.</td></tr>
+<tr><td>Release height stays “–”</td><td>Switch not assigned or wrong position</td><td>Check “Tow release” and “Released at” or “Motor off (switch)”.</td></tr>
+<tr><td>Motor never shows “MOTOR RUN”</td><td>Throttle not assigned (“S1” not found)</td><td>Select “Throttle (control/ch.)” by hand.</td></tr>
+<tr><td>Only a tone instead of a voice on alarm</td><td>Voice files missing in <code>scripts/glider/audio/</code></td><td>Reinstall Glider via the Suite; the package contains the announcements.</td></tr>
+<tr><td>No sound at all on alarm</td><td>Announcements off or volume 0 (the mute switch lets red alarms through)</td><td>Switch on “Sound and voice on alarm”, check the mute switch and the radio volume.</td></tr>
+<tr><td>The screen shows “Area too small”</td><td>The frame is too small (layout with several frames)</td><td>Select layout <b>Full screen</b> or <b>one frame with top and bottom bar</b> (chapter 3).</td></tr>
+<tr><td>Red text at the bottom left</td><td>Script error. The radio keeps working.</td><td>Take a photo of the text and report it as an issue in the repo (see test guide).</td></tr>
+<tr><td>The widget is missing from the list</td><td>Not installed or radio not restarted</td><td>Repeat chapter 2, restart the radio.</td></tr>
+</table>
+<h2>10. Update and remove</h2>
+<div class="kasten"><b>Renamed in 0.5.0:</b> Segler is now called <b>Glider</b> (folder <code>scripts/glider</code>, Studio file <code><i>id</i>.glider.lua</code>). This is a breaking change: choose the widget Glider again on every model and set it up again; the settings of the old widget are not taken over. Re-transfer Studio files from Lua-Studio or rename them; an old <code><i>id</i>.segler.lua</code> is still read as long as no new file exists. The old folder <code>scripts/segler</code> can then be deleted.</div>
+<p><b>Update:</b> Install the new ZIP exactly as in chapter 2. The Suite only replaces the program. Your settings, sensors and the flight list are kept (folder <code>daten/</code> in the script folder).</p>
+<p><b>Remove:</b> First take the widget off the screen (Model › Screens), then uninstall it in FrSky Suite under Lua-Bibliothek.</p>
+<h2>11. Which radios</h2>
+<table><tr><th>Display</th><th>Radios</th><th>Status</th></tr>
+<tr><td>800 × 480, touch</td><td>X20, X20S, X20HD, X20 Pro, X20R, X20RS, X18R, X18RS</td><td>tested in the simulator; X18RS: tested on the radio (see test status)</td></tr>
+<tr><td>640 × 360, no touch</td><td>Twin X14, X14S</td><td>simulated</td></tr>
+<tr><td>480 × 320, touch</td><td>X18, X18S, X18SE, Twin X Lite, Twin X Lite S</td><td>simulated</td></tr>
+<tr><td>480 × 272, no touch</td><td>X10, X10S, X10 Express, X12S with Ethos</td><td>simulated; size of the compact view not measured</td></tr>
+</table>
+<h2 class="neu">12. Lua-Studio: your own display per model</h2>
+<p>With the PC program <b>Lua-Studio</b> you design the display for each model yourself: which value goes where, as number,
+ring, bar (horizontal or vertical), curve or state, with your own colours, limits and settings. The studio writes one
+file per model to the radio, e.g. <code>scripts/studio/M__we_2.glider.lua</code>. The first part is the model id: the model name with every character other than A–Z, a–z and 0–9 turned into “_”. An umlaut counts as two characters and becomes “__” (“Möwe 2” becomes “M__we_2”). It is cut to 32 characters. Without this file Glider works exactly
+as before.</p>
+<div class="halb">
+<div><img src="../bilder-simulator/Glider - Sim 784x316 33 Studio Beispiel.png" alt="studio compact"><div class="t">Own layout in the compact view (German pictures)</div></div>
+<div><img src="../bilder-simulator/Glider - Sim 800x480 34 Studio Beispiel.png" alt="studio full screen"><div class="t">Own layout in full screen (replaces page 1)</div></div>
+</div>
+<ul>
+<li><b>Where it applies:</b> The file can hold one arrangement for the compact view and one for full screen. If the size
+matches the screen exactly, Glider draws it. In full screen it replaces page 1 only; power and flights stay, as does the
+top bar.</li>
+<li><b>Limits:</b> Warning and alarm apply per value for the whole model, no matter how or how often the value is shown. A
+limit missing in the file keeps the factory limit. Sensors and channels can have limits too; they report with a tone.</li>
+<li><b>Changes on the radio:</b> Changes in the widget menu go to a separate file <code>…glider.funke.lua</code>; the studio
+file stays unchanged. The menu shows “Studio file: loaded” at the top. <b>Back to studio state</b> discards the changes made
+on the radio. Without a studio file the button is <b>Back to default</b> and resets all settings to the factory values
+(sensors and switches stay).</li>
+<li><b>For the studio</b> Glider writes an info file (<code>…glider.info.json</code>) after each model change with model,
+radio, window sizes and the sensor list.</li>
+</ul>
+<table>
+<tr><th>Note at the bottom (8 s, then “!” top right)</th><th>Meaning</th><th>What to do</th></tr>
+<tr><td>“Studio file broken - default”</td><td>The file is damaged or not allowed. Glider works as without studio.</td><td>Transfer it again from the studio.</td></tr>
+<tr><td>“Studio file too new - update the Lua”</td><td>The studio wrote a newer format.</td><td>Update Glider (chapter 10).</td></tr>
+<tr><td>“Studio file: 3 errors”</td><td>Single entries were invalid. They use the default, the rest applies.</td><td>Check in the studio and transfer again.</td></tr>
+<tr><td>“Changes on the radio discarded”</td><td>The file with the changes made on the radio was damaged.</td><td>Make the changes in the menu again.</td></tr>
+<tr><td>“Change not saved”</td><td>The menu change could not be written (SD card full or write protected).</td><td>Check the SD card.</td></tr>
+</table>
+
+<p class="klein">Glider version 0.5.0 · 21 Nov 2026</p>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+ "skripte": [
+  [
+   "src/glider",
+   "glider"
+  ]
+ ],
+ "ersetze": [
+  [
+   "scripts/glider/suche.lua",
+   "loadfile(\"kennung.lua\")",
+   "loadfile(\"/scripts/glider/kennung.lua\")"
+  ]
+ ],
+ "schritte": [
+  {
+   "makro": "test/30-suche-simulator.lua"
+  },
+  {
+   "zustand": {
+    "hoehe": "RB Hoehe@0F30",
+    "vario": "RB Vario@0F30",
+    "a1": "RxBatt@F104",
+    "a2": "ESC Spannung@0B50",
+    "aStrom": "Strom@0200",
+    "aMah": "Kraftstoff@0600",
+    "aProz": "nil",
+    "hinweis_a2": "2"
+   },
+   "ordner": "glider"
+  }
+ ]
+}

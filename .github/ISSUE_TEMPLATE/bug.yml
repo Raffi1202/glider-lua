@@ -1,0 +1,57 @@
+name: Bug report
+description: Something does not work as described in the manual, the wiki or the test guide.
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: radio
+    attributes:
+      label: Radio
+      description: e.g. X18RS, X20S, Twin X Lite
+    validations:
+      required: true
+  - type: input
+    id: ethos
+    attributes:
+      label: Ethos version
+      description: e.g. 26.2.0
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Segler version
+      description: shown in the widget menu, e.g. 0.4.0
+    validations:
+      required: true
+  - type: input
+    id: testcase
+    attributes:
+      label: Test case (number from TESTLEITFADEN.md, if any)
+  - type: textarea
+    id: sensors
+    attributes:
+      label: Receiver and sensors
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Log
+      description: Lines with "Segler" from the debug log of the FrSky Suite, or red text at the bottom left of the widget
+      render: text
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Drag an image here (optional)
