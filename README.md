@@ -79,10 +79,10 @@ GPL-3.0, see [LICENSE](LICENSE).
 
 | Project | What it does |
 |---|---|
-| [Elektro](https://github.com/Raffi1202/elektro-lua) | Ethos widget for electric models |
-| [Heli RF](https://github.com/Raffi1202/heli-lua) | Ethos widget for Rotorflight helicopters |
+| [Electric](https://github.com/Raffi1202/electric-lua) | Ethos widget for electric models |
+| [Heli](https://github.com/Raffi1202/heli-lua) | Ethos widget for helicopters (Rotorflight) |
 | [Jet](https://github.com/Raffi1202/jet-lua) | Ethos widget for turbines (several ECU brands) |
-| [Motoren ECU / Vergaser](https://github.com/Raffi1202/motoren-lua) | Ethos widgets for gas engines |
+| [Gas Engine ECU / Carb](https://github.com/Raffi1202/gas-engine-lua) | Ethos widgets for gas engines |
 | [Lua-Studio](https://github.com/Raffi1202/lua-studio) | PC app to set up the widgets (Mac/Windows) |
 | [Telemetry simulator](https://github.com/Raffi1202/telemetrie-simulator) | ESP32-S3 that simulates FrSky telemetry sensors |
 | [Ethos model converter](https://github.com/Raffi1202/ethos-modell-konverter) | Move models between Ethos radios |

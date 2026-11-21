@@ -17,5 +17,5 @@ docs/* ENTWURF.pdf
 # Zwischenstände der Simulator-Abläufe
 test/stand-*/
 
-# lokale Arbeitsnotizen, nie im Repo
+# local working notes
 STAND.md
