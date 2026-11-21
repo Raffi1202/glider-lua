@@ -1,5 +1,5 @@
 -- Glider: Sensoren und Schalter automatisch zuweisen. Füllt nur leere Felder; was von Hand gesetzt ist, bleibt.
--- Ablauf nach «Vorgaben Sensorzuordnung» (FrSky Koordination, 20.11.2026):
+-- Ablauf nach «Vorgaben Sensorzuordnung» (20.11.2026):
 -- Stufe 1: Kennung über AppID + Teilwert (kennung.lua, nur während der Suche geladen). Je Feld eine Liste von
 --          Schlüsseln in Rangfolge; der erste Schlüssel, zu dem es einen Sensor gibt, gewinnt. Der Name zählt nicht.
 --          Mehrere Sensoren zum selben Schlüssel (Instanzen, Physical IDs): (a) der mit gültigem Wert,
