@@ -175,8 +175,9 @@ M.folge = {
 -- Kennung des Speicherformats: erhöhen, wenn sich die Reihenfolge der Quellen in M.folge doch einmal ändert.
 -- 2 (0.4.0): «Alarm auch bei Motor aus» am Ende von M.folge. Die Quellen im Widget-Speicher sind unverändert, darum
 -- liest das Lua FORMAT 1 (0.3.x) weiter ohne Verlust; die neuen Ja/Nein-Werte stehen mit Namen in daten/ (fehlen = ja).
-M.FORMAT = 2
-local FORMAT_ALT = { [1] = true, [2] = true }
+-- 3 (0.6.0): Wahl «Studio-Layout» als Text NACH «ende» (Pfad oder ""). FORMAT 1/2 lesen weiter ohne Verlust, Wahl = auto.
+M.FORMAT = 3
+local FORMAT_ALT = { [1] = true, [2] = true, [3] = true }
 
 -- Feld zu einem Namen (Verzeichnis einmal aufbauen: Ethos begrenzt die Befehle je Aufruf).
 local INDEX = nil
@@ -347,6 +348,9 @@ function M.lies(w, nurDatei)
       if hol("ende") == fmt then
         gefunden = true
         for i, name in ipairs(q) do c[name] = istQuelle(werte[i]) and werte[i] or nil end
+        w.fmtGelesen = fmt                        -- Test: Speicherformat der Vorversion (Update-Beweis)
+        local wahl = fmt >= 3 and hol("studio") or nil
+        w.studioWahl = (type(wahl) == "string" and #wahl < 128) and wahl or ""
       else
         print(tostring(w.name) .. ": gespeicherte Sensoren unlesbar, bitte neu zuweisen")
       end
@@ -393,6 +397,7 @@ function M.schreibe(w)
     pcall(storage.write, "q" .. i, istQuelle(v) and v or 0)
   end
   pcall(storage.write, "ende", M.FORMAT)
+  pcall(storage.write, "studio", type(w.studioWahl) == "string" and w.studioWahl or "")
 end
 
 -- Zahlen, Texte, dauerhafte Werte, Flugliste und laufender Flug in die Datei. Gibt true zurück, wenn geschrieben.

@@ -133,10 +133,11 @@ local ms = nil
 for _, m in ipairs(sd and sd.mon or {}) do if m.key == "sensor:0200:0" then ms = m end end
 fall("Sensor ohne Physical ID über die Sensorliste (Zahlform) gefunden", ms and ms.d.q and ms.d.q.name() == "Strom")
 fall("Anpassung 6.4 (Name, Einheit, Stellen)", sd and sd.werte["sensor:0830:0"] and sd.werte["sensor:0830:0"].faktor == 0.5)
-local f = io.open(S.PFAD .. KENNUNG .. ".glider.info.json", "r")
-local info = f and f:read("a") or ""
-if f then f:close() end
-fall("Info-Datei geschrieben", info:find('"studioDatei": "geladen"', 1, true) and info:find('"kennung": "Testmodell___"', 1, true)
+-- 0.6.0: den Kopf der Info-Datei baut studio.lua, der Kern hängt studioQuelle … hinweis an und schreibt (R4)
+local info = sd and sd.infoKopf or ""
+fall("Info-Kopf und Pfad gebaut", sd and sd.infoPfad == S.PFAD .. KENNUNG .. ".glider.info.json")
+fall("Info-Datei: studioQuelle und Wahl", sd and sd.quelle == S.PFAD .. KENNUNG .. ".glider.lua" and sd.wahl == "auto")
+fall("Info-Kopf", info:find('"studioDatei": "geladen"', 1, true) and info:find('"kennung": "Testmodell___"', 1, true)
   and info:find('"name": "H\\u00F6he', 1, true) == nil and info:find('\\"2\\"', 1, true) ~= nil and info:find('"breite": 784', 1, true) ~= nil)
 
 -- 4. .funke.lua: Änderung schreiben, neu laden, zusammenführen

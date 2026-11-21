@@ -17,16 +17,16 @@ height and thermals and announces them, and it keeps a list of all flights. Disp
 - **Batteries** with cell sensor or pack voltage only; limits in two stages (warning orange, alarm red with tone and voice).
 - **Flight list** with summary; each flight can be deleted.
 - **Lua-Studio:** a settings file per model designs the display freely; without it everything works as before.
-- **New in 0.5.0:** renamed from **Segler** to **Glider** (breaking: re-add the widget on each model; Studio files `<id>.glider.lua`, old `<id>.segler.lua` are still read as a transition). See [Upgrading](wiki/en/Installation.md#upgrading-from-segler-040-and-older).
+- **New in 0.6.0:** Studio layout is always found (search SD + radio, choice in the menu «Studio layout», scaling to other window sizes, note line). **New in 0.5.0:** renamed from **Segler** to **Glider** (breaking: re-add the widget on each model; Studio files `<id>.glider.lua`, old `<id>.segler.lua` are still read as a transition). See [Upgrading](wiki/en/Installation.md#upgrading-from-segler-040-and-older).
 - **0.4.0:** "Alarm also with motor off" per value (menu and Lua-Studio, on by default); a Lua-Studio limit
   without a numeric level never switches an alarm off; storage format 2 (0.3.x settings are kept).
 
-**Status:** public pre-release (public beta). 0.5.0 is tested in the Ethos simulator; the transmitter test on the X18RS
+**Status:** public pre-release (public beta). 0.6.0 is tested in the Ethos simulator; the transmitter test on the X18RS
 follows. Use at your own risk. License: GPL-3.0, see below.
 
 ## Quick start
 
-1. Download `Glider-0.5.0.zip` from the latest **release** (`Glider-0.5.0-share.zip` also contains the manuals).
+1. Download `Glider-0.6.0.zip` from the latest **release** (`Glider-0.6.0-share.zip` also contains the manuals).
 2. Connect the radio by USB, choose **Ethos Suite** on the radio and open the **FrSky Suite** on the computer.
 3. Suite › **Lua library** › **Install from local ZIP** › choose the ZIP. Then restart the radio.
 4. Model › Screens › **+** › layout **Full screen** (or one frame with bars) › tap the frame › widget **Glider**.
@@ -42,6 +42,13 @@ follows. Use at your own risk. License: GPL-3.0, see below.
 | Bugs and wishes | GitHub › Issues › New issue |
 | Versions | [`CHANGELOG.md`](CHANGELOG.md) |
 
+## Studio layout not showing?
+
+1. Copy the file to `scripts/studio/` (SD card or radio memory, both work).
+2. If the file name does not match the model name: widget menu › **Studio layout** › choose the file.
+3. Look at the note line at the bottom of the widget: it says why the default display is shown (file faulty, no matching view, chosen file missing).
+4. The info file `scripts/studio/<model id>.glider.info.json` shows `studioQuelle`, `studioWahl` and `hinweis`.
+
 ## Radios and test status
 
 | Display | Radios | Status |
@@ -53,7 +60,7 @@ follows. Use at your own risk. License: GPL-3.0, see below.
 
 Tested on a real X18RS up to 0.3.0: start, pages and announcements, sensor search with 48 sensors, compact view with
 live telemetry, update from 0.1.4, the Lua-Studio file (example, broken file, 10 model changes). Not yet tested on a
-radio: everything new in 0.3.1, 0.4.0 and 0.5.0, a real flight, all radios except the X18RS. The pages Power and Flights exist
+radio: everything new in 0.3.1, 0.4.0, 0.5.0 and 0.6.0, a real flight, all radios except the X18RS. The pages Power and Flights exist
 in full screen only.
 
 ## Development

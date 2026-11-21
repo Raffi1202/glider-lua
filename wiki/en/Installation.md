@@ -4,12 +4,12 @@
 
 ## What you need
 - A FrSky radio with Ethos 26.1 or newer (tested with 26.2) and a colour display.
-- `Glider-0.5.0.zip` from the latest release (it is also inside `Glider-0.5.0-share.zip` with the manuals).
+- `Glider-0.6.0.zip` from the latest release (it is also inside `Glider-0.6.0-share.zip` with the manuals).
 - The FrSky Suite on your computer (download at frsky-rc.com).
 
 ## Install with the FrSky Suite
 1. Connect the radio by USB and choose **Ethos Suite** on the radio.
-2. In the Suite open **Lua library › Install from local ZIP** and select `Glider-0.5.0.zip` (the inner ZIP, do not unpack it).
+2. In the Suite open **Lua library › Install from local ZIP** and select `Glider-0.6.0.zip` (the inner ZIP, do not unpack it).
 3. Restart the radio.
 
 Without the Suite: connect the radio as USB storage and copy the folder `glider` from the package to `scripts/` on the SD card.

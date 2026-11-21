@@ -61,6 +61,41 @@ return function(w, F, A)
   -- Studio-Datei (Lua-Studio-Format v1): Stand anzeigen, zurück auf Studio-Stand bzw. Standard
   local mitStudio = w.sd and w.sd.status == "geladen"
   form.addStaticText(form.addLine(T.mStudio), nil, mitStudio and T.mStudioGeladen or T.mStudioFehlt)
+  -- Studio-Layout wählen (R2): alle *.glider.lua der drei Orte ohne .funke.lua, nur beim Öffnen des Menüs gesucht.
+  -- Zeigt SCRIPTS: auf denselben Ordner wie SD: oder RADIO: (gleiche Dateiliste), erscheint der Ort nur einmal.
+  if form.addChoiceField and A.studioWahl then
+    local wahl, pfade, gesehen = { { T.mAuto or "auto", 0 } }, {}, {}
+    for _, o in ipairs({ { "SCRIPTS:/studio/", "SCRIPTS" }, { "SD:/scripts/studio/", "SD" }, { "RADIO:/scripts/studio/", "RADIO" } }) do
+      local ok, l = pcall(system.listFiles, o[1])
+      if ok and type(l) == "table" then
+        local n = {}
+        for _, d in ipairs(l) do
+          if type(d) == "string" and d:sub(-11) == ".glider.lua" and d:sub(-17) ~= ".glider.funke.lua" then n[#n + 1] = d end
+        end
+        table.sort(n)
+        local sig = table.concat(n, "/")
+        if #n > 0 and not gesehen[sig] then
+          gesehen[sig] = true
+          for _, d in ipairs(n) do
+            if #pfade < 60 then
+              pfade[#pfade + 1] = o[1] .. d
+              wahl[#wahl + 1] = { d:sub(1, -12) .. " (" .. o[2] .. ")", #pfade }
+            end
+          end
+        end
+      end
+    end
+    local akt = w.studioWahl or ""
+    if akt ~= "" then
+      local da = false
+      for _, p in ipairs(pfade) do if p == akt then da = true end end
+      if not da then pfade[#pfade + 1] = akt wahl[#wahl + 1] = { akt:match("[^/]*$") .. " (?)", #pfade } end
+    end
+    form.addChoiceField(form.addLine(T.mLayout or "Studio layout"), nil, wahl, function()
+      for i, p in ipairs(pfade) do if p == (w.studioWahl or "") then return i end end
+      return 0
+    end, function(v) A.studioWahl(pfade[v] or "") end)
+  end
   if form.addButton and A.zurueckStd then
     local tz = mitStudio and T.mStudioZurueck or T.mStandardZurueck
     form.addButton(form.addLine(tz), nil, { text = T.mZurueckKnopf, press = function()

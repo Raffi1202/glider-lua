@@ -147,7 +147,12 @@ do
   fall("j2) neue Haken nach Update EIN", wu.cfg.hMot == true and wu.cfg.pMot == true and wu.cfg.rMot == true
     and wu.cfg.z1Mot == true and wu.cfg.z2Mot == true and wu.cfg.z3Mot == true and wu.cfg.dMot == true)
   F.schreibe(wu)
-  fall("j3) danach als FORMAT 2 geschrieben und wieder gelesen", mem.fmt == 2 and mem.ende == 2 and F.lies(wu) and wu.cfg[q[1]] == quelle)
+  fall("j3) danach als FORMAT 3 geschrieben und wieder gelesen", mem.fmt == 3 and mem.ende == 3 and F.lies(wu) and wu.cfg[q[1]] == quelle)
+  fall("j4) Update: Studio-Wahl steht auf automatisch", wu.studioWahl == "" and mem.studio == "")
+  wu.studioWahl = "SD:/scripts/studio/Falsch.glider.lua"
+  F.schreibe(wu)
+  wu.studioWahl = nil
+  fall("j5) Studio-Wahl am Ende des Speichers geschrieben und gelesen", F.lies(wu) and wu.studioWahl == "SD:/scripts/studio/Falsch.glider.lua" and wu.cfg[q[1]] == quelle)
   io.open = alt
 end
 print(fehler == 0 and "ERGEBNIS: kein Fehler" or ("ERGEBNIS: " .. fehler .. " Fehler"))

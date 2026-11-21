@@ -43,6 +43,7 @@ local KURVE = {
   { { 1.00, 0 }, { 1.10, 10 }, { 1.20, 40 }, { 1.25, 70 }, { 1.30, 90 }, { 1.40, 100 } },
 }
 
+local ansichtWaehlen, infoNach   -- weiter unten (R3/R4)
 local function lade(datei)
   local f, e = loadfile(datei)
   if not f then error(e, 0) end
@@ -294,11 +295,14 @@ end
 -- Hinweise zur Studio-Datei (Abschnitt 3): Band unten 8 s, danach «!» oben rechts bis zum Modellwechsel
 local function studioHinweis(w, now)
   local sd, T, t = w.sd, w.T, {}
-  if sd.status == "kaputt" then t[#t + 1] = T.sdKaputt
-  elseif sd.status == "zuNeu" then t[#t + 1] = T.sdZuNeu
+  w.sdZeile = nil
+  if sd.status == "kaputt" or sd.status == "zuNeu" then   -- R4: Dauerzeile unten mit Grund
+    w.sdZeile = string.format(T.sdDefekt, sd.status == "kaputt" and T.sdGrundKaputt or T.sdGrundZuNeu)
+  elseif sd.status == "fehlt" and sd.wahlFehlt then w.sdZeile = T.sdWahlFehlt
   elseif sd.status == "geladen" and sd.fehler > 0 then t[#t + 1] = string.format(T.sdFehler, tostring(sd.fehler)) end
   if sd.funkeVerworfen then t[#t + 1] = T.sdFunkeWeg end
-  if #t > 0 then w.sdHinweis, w.sdHinweisBis = table.concat(t, "  |  "), now + HINWEIS_S end
+  w.sdHinweis0, w.sdNurBand = nil, nil
+  if #t > 0 then w.sdHinweis, w.sdHinweisBis = table.concat(t, "  |  "), now + HINWEIS_S w.sdHinweis0 = w.sdHinweis end
 end
 
 function K.neu()
@@ -960,6 +964,8 @@ local function testZustand(w, now)
   w.testExtra = { flug = w.flug, nListe = #w.liste, ak = ak, phase = w.phaseName, vMittel = w.vMittel, th = w.th,
     sd = w.sd and { status = w.sd.status, fehler = w.sd.fehler, nA = #(w.sd.ansichten or {}), nMon = #(w.sd.mon or {}) },
     A = w.A and (w.A.breite .. "x" .. w.A.hoehe) or "",
+    aG = w.aInfo and w.aInfo.genutzt or "", aP = w.aInfo and w.aInfo.angepasst or false, aWeg = w.aInfo and w.aInfo.weg or 0,
+    zeile = w.sdZeile or "", fmt = w.fmtGelesen or 0, wahl = w.studioWahl or "", quelle = w.sd and w.sd.quelle or "",
     mem = floor(collectgarbage("count")),
     nVerlauf = #w.vl, motor = w.v.motor, dialog = w.dialog, detail = w.detail, nAnsage = w.nAnsage or 0,
     antrieb = w.v.antrieb or 0 }
@@ -1051,7 +1057,7 @@ function K.wecke(w)
         collectgarbage()
         studioAnwenden(w)
         studioHinweis(w, now)
-        w.L = nil                                  -- passende Ansicht neu suchen
+        w.L, w.aGr = nil, nil                      -- passende Ansicht neu suchen (wakeup, R3)
       end
     end
     local A = w.A
@@ -1093,8 +1099,11 @@ function K.wecke(w)
   if now - w.tB >= DT_BILD then
     w.tB = now
     if Z == nil then Z = lade("zeichnen.lua") end
+    local neuGewaehlt = false                     -- Umrechnen (R3) und Vorbereiten nie im selben Aufruf (Befehlsgrenze)
+    if w.fW and w.aGr ~= w.fW .. "x" .. w.fH and not w.sdAuf then ansichtWaehlen(w, now) neuGewaehlt = true
+    elseif w.infoNeu and w.aGr and not w.sdAuf then infoNach(w) end
     if w.A then PLATZ = PLATZ or lade("platz.lua") else PLATZ = nil end
-    if PLATZ and w.A and w.L and Z.C then PLATZ.vorbereiten(w, w.L, Z, w.A, PLAETZE_JE_BILD) end
+    if PLATZ and w.A and w.L and Z.C and not neuGewaehlt then PLATZ.vorbereiten(w, w.L, Z, w.A, PLAETZE_JE_BILD) end
     local L = w.L
     if L and L.kompakt then                       -- Kompaktansicht: nur kompakt.lua, die Seiten freigeben
       if KOMPAKT == nil then
@@ -1114,15 +1123,84 @@ function K.wecke(w)
   end
 end
 
--- Hinweis zur Studio-Datei: Band unten (24 px, über den Plätzen), danach «!» oben rechts
+-- R3: Ansicht zur Fenstergrösse wählen. Genau passend wie bisher, sonst ähnlichstes Seitenverhältnis (bei Gleichstand
+-- grössere Fläche), Plätze einmal proportional umgerechnet (platz.lua). Läuft im wakeup, nie in paint.
+ansichtWaehlen = function(w, now)
+  local W, H, sd, T = w.fW, w.fH, w.sd, w.T
+  w.aGr, w.A, w.aInfo = W .. "x" .. H, nil, { genutzt = "", angepasst = false, weg = 0 }
+  w.sdHinweis, w.sdNurBand = w.sdHinweis0, nil
+  if not (sd and sd.status == "geladen") then return end
+  local best, bq, bf = nil, 0, 0
+  for _, a in ipairs(sd.ansichten or {}) do
+    if a.breite == W and a.hoehe == H then best, bq = a, -1 break end
+    local q = math.abs(math.log((a.breite / a.hoehe) / (W / H)))
+    local f = a.breite * a.hoehe
+    if best == nil or q < bq - 1e-9 or (q <= bq + 1e-9 and f > bf) then best, bq, bf = a, q, f end
+  end
+  local leer = best == nil
+  if best and bq ~= -1 then
+    PLATZ = PLATZ or lade("platz.lua")
+    local neu, weg = PLATZ.umrechnen(best, W, H)
+    w.aInfo.angepasst, w.aInfo.weg = true, weg
+    local vor = w.sdHinweis0
+    w.sdHinweis = string.format(T.sdAngepasst, best.breite .. "x" .. best.hoehe) .. (weg > 0 and string.format(T.sdWeg, weg) or "")
+      .. (vor and ("  |  " .. vor) or "")
+    w.sdHinweisBis, w.sdNurBand = now + 5, vor == nil
+    leer = #neu.plaetze == 0
+    best = neu
+  end
+  if leer then
+    w.sdZeile = T.sdKeineAnsicht
+    w.sdHinweis = nil
+  else
+    w.A = best
+    w.aInfo.genutzt = best.breite .. "x" .. best.hoehe
+    if w.sdZeile == T.sdKeineAnsicht then w.sdZeile = nil end
+  end
+  w.infoNeu = true
+end
+
+-- Info-Datei mit den Feldern aus R4 am Ende schreiben (Kopf baut studio.lua beim Laden)
+local function js(t)
+  return '"' .. tostring(t or ""):gsub('[%c"\\]', function(c)
+    if c == '"' then return '\\"' elseif c == "\\" then return "\\\\" end
+    return string.format("\\u%04X", c:byte())
+  end) .. '"'
+end
+infoNach = function(w)
+  w.infoNeu = nil
+  local sd, a = w.sd, w.aInfo or {}
+  if not (sd and sd.infoKopf) then return end
+  local hinweis = w.sdZeile or (a.angepasst and w.sdHinweis) or ""
+  local t = sd.infoKopf .. ',\n  "studioQuelle": ' .. js(sd.quelle) .. ',\n  "studioWahl": ' .. js(sd.wahl or "auto") ..
+    ',\n  "ansichtGenutzt": ' .. js(a.genutzt) .. ',\n  "angepasst": ' .. tostring(a.angepasst == true) ..
+    ',\n  "hinweis": ' .. js(hinweis) .. '\n}\n'
+  local p = sd.infoPfad
+  if SITZUNG[p] == t then return end
+  pcall(os.mkdir, "SCRIPTS:/studio")
+  local okO, f = pcall(io.open, p, "w")
+  if okO and f then
+    local okW = pcall(f.write, f, t)
+    f:close()
+    if okW then SITZUNG[p] = t return end
+  end
+  print("Glider Studio: Info-Datei nicht geschrieben")
+end
+
+-- Hinweis zur Studio-Datei: Band unten (24 px, über den Plätzen), danach «!» oben rechts.
+-- w.sdZeile (R4): Standardanzeige trotz Datei, Grund steht dauernd unten.
 local function studioBand(w, L)
+  local C = Z.C
+  if w.sdZeile and not w.A then
+    Z.rechteck(0, L.H - 20, L.W, 20, C.dunkel)
+    Z.text(L, L.W / 2, L.H - 10, w.sdZeile, 12 / (1.25 * L.s), C.orange, CENTERED, L.W - 12)
+  end
   local t = w.sdHinweis
   if not t then return end
-  local C = Z.C
   if (w.tL or 0) < (w.sdHinweisBis or 0) then
     Z.rechteck(0, L.H - 24, L.W, 24, C.dunkel)
     Z.text(L, L.W / 2, L.H - 12, t, 14 / (1.25 * L.s), C.orange, CENTERED, L.W - 12)
-  else
+  elseif not w.sdNurBand then
     Z.text(L, L.W - 6, 10, "!", 16 / (1.25 * L.s), C.orange, RIGHT)
   end
 end
@@ -1135,10 +1213,7 @@ function K.zeichne(w)
     L = Z.layout(W, H)
     w.L = L
     w.fenster[W .. "x" .. H] = true
-    w.A = nil                                    -- Studio-Ansicht, deren Grösse genau passt (6.2)
-    for _, a in ipairs(w.sd and w.sd.ansichten or {}) do
-      if a.breite == W and a.hoehe == H then w.A = a break end
-    end
+    w.fW, w.fH = W, H                            -- Ansicht wählt und rechnet der wakeup (R3, einmal je Grösse)
   end
   Z.punkt = w.sp == 2            -- Englisch: Dezimalpunkt, Tausender mit Komma
   Z.grund(L)
@@ -1323,6 +1398,12 @@ function K.menue(w)
       w.sucheAktiv, w.sucheQuelle, w.sz, w.sucheFn = true, "menue", nil, nil
       return "gestartet"
     end,
+    studioWahl = function(p)                        -- R2: Wahl im Menü, gespeichert am Ende des Widget-Speichers
+      if p == (w.studioWahl or "") then return end
+      w.studioWahl = p
+      w.sd, w.sdAuf, w.sz2, w.sdZeile = nil, true, nil, nil
+      if model and model.dirty then pcall(model.dirty) end
+    end,
     reset = function() zurueck(w, os.clock()) end,
     loesche = function(nr) loesche(w, nr, os.clock()) end,
     beende = function()
@@ -1337,7 +1418,9 @@ end
 
 function K.lies(w)
   local F = lade("felder.lua")
+  local vorher = w.studioWahl or ""
   w.gelesen = F.lies(w)
+  if (w.studioWahl or "") ~= vorher and not w.sdAuf then w.sd, w.sdAuf, w.sz2, w.sdZeile = nil, true, nil, nil end
   w.autoOffen = not w.gelesen
   studioAnwenden(w)                                -- Studio-Datei vor Widget-Speicher und daten/ (Abschnitt 9)
   grenzen(w)

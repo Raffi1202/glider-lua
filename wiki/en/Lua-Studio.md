@@ -13,3 +13,10 @@ Details: manual chapter 12.
 
 ---
 [← Home](../Home.md) | [← Previous](Alarms.md) | [Next →](FAQ.md)
+
+## Studio layout not showing?
+
+- Copy the file to `scripts/studio/` on the SD card or in the radio memory; Glider searches both (0.6.0).
+- File name does not match the model: widget menu › **Studio layout** › choose the file.
+- The note line at the bottom says why the default display is shown; the info file has `studioQuelle`, `studioWahl`, `hinweis`.
+- Window size differs from the view: Glider scales the most similar view (note "Studio: view 800x480 adapted").

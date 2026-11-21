@@ -48,7 +48,7 @@
 <body>
 
 <h1>Glider</h1>
-<div class="unter">Flug-Anzeige für Segler und E-Segler · Anleitung · Version 0.5.0 · Stand 21.11.2026</div>
+<div class="unter">Flug-Anzeige für Segler und E-Segler · Anleitung · Version 0.6.0 · Stand 22.11.2026</div>
 
 <div class="bild schmal">
   <img src="../bilder-simulator/Glider - Sim 800x480 04 Normal.png" alt="Glider auf dem Sender">
@@ -59,7 +59,7 @@ Bildschirm Vario, Höhe, Flugzeit, Akkus und Empfang, erkennt Start, Ausklinkhö
 kommt in eine Liste mit Übersicht, und du wirst gewarnt, wenn Höhe, Akku oder Empfang eine eingestellte Grenze verlassen.</p>
 
 <div class="kasten">
-  <b>Stand der Erprobung (Version 0.5.0):</b> Zufallstest und 37 Abläufe im Ethos-Simulator (X18RS, Ethos 26.2.0)
+  <b>Stand der Erprobung (Version 0.6.0):</b> Zufallstest und 37 Abläufe im Ethos-Simulator (X18RS, Ethos 26.2.0)
   fehlerfrei, auch Einstellungen und Flugliste nach einem Update. Vollbild 800 × 480 direkt getestet, 640 × 360, 480 × 320
   und 480 × 272 nachgestellt; Kompaktansicht 784 × 316 direkt, 630 × 258 und 472 × 210 nachgestellt.
   Am echten Sender (X18RS, Ethos 26.2.0): Start, drei Seiten und Ansagen (0.1.1), Sensorsuche mit 48 Sensoren und
@@ -73,7 +73,7 @@ kommt in eine Liste mit Übersicht, und du wirst gewarnt, wenn Höhe, Akku oder 
   <li>Ein Modell, bei dem die Telemetrie läuft und die Sensoren schon gesucht sind (Modell › Telemetrie › Sensoren suchen).</li>
   <li>Ein Vario mit Höhe und Steigen. Ohne Vario fehlen Flug, Ausklinkhöhe und Thermik.</li>
   <li>Einen Computer mit der FrSky Suite und ein USB-Kabel.</li>
-  <li>Die Datei <code>Glider-0.5.0.zip</code>. Sie liegt neben dieser Anleitung in <code>Glider-0.5.0-share.zip</code>. Entpacke nur die äussere ZIP, die innere nicht.</li>
+  <li>Die Datei <code>Glider-0.6.0.zip</code>. Sie liegt neben dieser Anleitung in <code>Glider-0.6.0-share.zip</code>. Entpacke nur die äussere ZIP, die innere nicht.</li>
 </ul>
 
 <h2>2. Installieren</h2>
@@ -82,7 +82,7 @@ kommt in eine Liste mit Übersicht, und du wirst gewarnt, wenn Höhe, Akku oder 
   <li>Am Sender erscheint eine Auswahl. Wähle <b>Ethos Suite</b>.</li>
   <li>Öffne am Computer die <b>FrSky Suite</b>. Der Sender wird oben angezeigt.</li>
   <li>Klicke auf <b>Lua-Bibliothek</b>, dann auf <b>Von lokaler ZIP installieren</b>.</li>
-  <li>Wähle die Datei <code>Glider-0.5.0.zip</code>. Die Suite kopiert alles in den Ordner <code>scripts/glider/</code> auf dem Sender.</li>
+  <li>Wähle die Datei <code>Glider-0.6.0.zip</code>. Die Suite kopiert alles in den Ordner <code>scripts/glider/</code> auf dem Sender.</li>
   <li>Ziehe das Kabel ab und starte den Sender neu.</li>
 </ol>
 <p class="klein">Ohne Suite: Sender als «USB-Speicher» anschliessen und den Ordner <code>glider</code> aus der ZIP in den
@@ -417,6 +417,17 @@ Datei arbeitet Glider genau wie bisher.</p>
   <div><img src="../bilder-simulator/Glider - Sim 800x480 34 Studio Beispiel.png" alt="Studio Vollbild"><div class="t">Eigene Belegung im Vollbild (ersetzt Seite 1)</div></div>
 </div>
 <ul>
+<li><b>Wo die Datei liegen darf (0.6.0):</b> Glider sucht in <code>scripts/studio/</code> des Skript-Speicherorts, auf der SD-Karte
+(<code>SD:/scripts/studio/</code>) und im Funkenspeicher (<code>RADIO:/scripts/studio/</code>), in dieser Reihenfolge.</li>
+<li><b>Welche Datei:</b> Die Datei mit der Modellkennung vorne (<code>…glider.lua</code>, siehe oben) wird automatisch genommen. Passt der Name nicht zum Modell,
+die Datei im Widget-Menü unter <b>Studio-Layout</b> wählen (alle <code>*.glider.lua</code> der drei Orte, Ort in Klammern).
+Die Wahl im Menü gilt vor dem Modellnamen; <b>automatisch (Modellname)</b> stellt zurück.</li>
+<li><b>Andere Fenstergrösse:</b> Passt keine Ansicht genau, nimmt Glider die mit dem ähnlichsten Seitenverhältnis und rechnet sie
+einmal auf das Fenster um (Hinweis «Studio: Ansicht 800x480 angepasst» für 5 s). Zu klein gewordene Plätze werden Zahl oder fallen weg.</li>
+<li><b>Hinweiszeile unten (bleibt):</b> «Studio: Datei fehlerhaft (…)», «Studio: keine passende Ansicht» oder «Studio: gewählte Datei fehlt»:
+Glider zeigt dann die Standardanzeige. Datei neu übertragen, Ansicht ergänzen oder neu wählen.</li>
+</ul>
+<ul>
   <li><b>Wo es gilt:</b> Die Datei kann je eine Anordnung für die Kompaktansicht und für das Vollbild enthalten. Passt die Grösse
   genau zum Bildschirm, zeichnet Glider sie. Im Vollbild ersetzt sie nur Seite 1. Elektrik und Flüge bleiben, ebenso die
   Leiste oben.</li>
@@ -439,7 +450,7 @@ Datei arbeitet Glider genau wie bisher.</p>
   <tr><td>«Änderung nicht gespeichert»</td><td>Die Änderung im Menü konnte nicht geschrieben werden (SD-Karte voll oder schreibgeschützt).</td><td>SD-Karte prüfen.</td></tr>
 </table>
 
-<p class="klein">Glider Version 0.5.0 · 21.11.2026</p>
+<p class="klein">Glider Version 0.6.0 · 22.11.2026</p>
 
 </body>
 </html>

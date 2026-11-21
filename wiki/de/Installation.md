@@ -4,12 +4,12 @@
 
 ## Was du brauchst
 - Einen FrSky-Sender mit Ethos ab 26.1 (getestet mit 26.2) und Farbdisplay.
-- `Glider-0.5.0.zip` aus dem neusten Release (auch in `Glider-0.5.0-share.zip` mit den Anleitungen).
+- `Glider-0.6.0.zip` aus dem neusten Release (auch in `Glider-0.6.0-share.zip` mit den Anleitungen).
 - Die FrSky Suite auf dem Computer (Download auf frsky-rc.com).
 
 ## Mit der FrSky Suite installieren
 1. Sender per USB anschliessen und am Sender **Ethos Suite** wählen.
-2. In der Suite **Lua-Bibliothek › Von lokaler ZIP installieren** und `Glider-0.5.0.zip` wählen (die innere ZIP, nicht entpacken).
+2. In der Suite **Lua-Bibliothek › Von lokaler ZIP installieren** und `Glider-0.6.0.zip` wählen (die innere ZIP, nicht entpacken).
 3. Sender neu starten.
 
 Ohne Suite: Sender als USB-Speicher anschliessen und den Ordner `glider` aus dem Paket nach `scripts/` auf die SD-Karte kopieren.

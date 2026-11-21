@@ -4,6 +4,7 @@
 
 Full list: [CHANGELOG.md](../../CHANGELOG.md).
 
+- **0.6.0** – Studio layout always found: search SD + radio, menu «Studio layout», scaling, note line, storage format 3.
 - **0.5.0** – renamed from Segler to Glider (breaking, see [Upgrading](Installation.md#upgrading-from-segler-040-and-older)).
 - **0.4.0** – "Alarm also with motor off" per value, Lua-Studio limits without a level never switch off, storage format 2.
 - **0.3.1** – red alarms despite mute, motor battery for every model type, Lua-Studio in steps.

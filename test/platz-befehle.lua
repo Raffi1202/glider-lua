@@ -52,8 +52,34 @@ for _, an in ipairs(w.sd.ansichten) do
   end
 end
 local fehler, hoechst = 0, 0
+-- 0.6.0 (R3): jede Ansicht auch auf andere Fenstergrössen umgerechnet; Befehle für umrechnen (wakeup) messen
+local liste = {}
 for _, an in ipairs(w.sd.ansichten) do
-  local L = Z.layout(an.breite, an.hoehe)
+  liste[#liste + 1] = { an, an.breite, an.hoehe }
+  for _, g in ipairs({ { 800, 480 }, { 784, 316 }, { 640, 360 }, { 630, 258 }, { 480, 320 }, { 472, 210 }, { 480, 272 } }) do
+    if g[1] ~= an.breite or g[2] ~= an.hoehe then
+      local zu = 0
+      debug.sethook(function()
+        local i = debug.getinfo(2, "S")
+        if i and i.source:match("^@[%w_]+%.lua$") then zu = zu + 1 end
+      end, "", 1)
+      local neu, weg = P.umrechnen(an, g[1], g[2], Z)
+      debug.sethook()
+      print(string.format("        umrechnen %dx%d -> %dx%d: %d Befehle, %d Plätze, %d weggelassen", an.breite, an.hoehe,
+        g[1], g[2], zu, #neu.plaetze, weg))
+      if zu >= 5000 then fehler = fehler + 1 end
+      for _, p in ipairs(neu.plaetze) do
+        if p.x < 0 or p.y < 0 or p.x + p.b > g[1] or p.y + p.h > g[2] then
+          print("FEHLER  Platz ausserhalb der Fläche") fehler = fehler + 1
+        end
+      end
+      liste[#liste + 1] = { neu, g[1], g[2] }
+    end
+  end
+end
+for _, eg in ipairs(liste) do
+  local an = eg[1]
+  local L = Z.layout(eg[2], eg[3])
   Z.punkt = false
   P.vorbereiten(w, L, Z, an, 16)
   local z = 0
@@ -78,7 +104,7 @@ for _, an in ipairs(w.sd.ansichten) do
   end
   print(string.format("        vorbereiten je Aufruf (4 Plätze): höchstens %d Befehle", vz))
   if vz > hoechst then hoechst = vz end
-  print(string.format("%s  Ansicht %d x %d, %d Plätze: %d Befehle%s", ok and "OK    " or "FEHLER", an.breite, an.hoehe,
+  print(string.format("%s  Ansicht %d x %d in %d x %d, %d Plätze: %d Befehle%s", ok and "OK    " or "FEHLER", an.breite, an.hoehe, eg[2], eg[3],
     #an.plaetze, z, ok and "" or ("  " .. tostring(e))))
   if not ok then fehler = fehler + 1 end
   if z > hoechst then hoechst = z end

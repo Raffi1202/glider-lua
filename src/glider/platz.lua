@@ -215,4 +215,39 @@ function P.zeichne(w, L, Z, A)
   end
 end
 
+-- R3: Ansicht a (andere Grösse) einmal auf W x H umrechnen. Die Fläche unter der eigenen Kopfzeile bzw. Leiste
+-- (Kompakt 36 px, Vollbild Statusleiste, je skaliert) wird proportional auf die Fläche unter der Kopfzeile des echten
+-- Fensters abgebildet. Zu kleine Plätze werden Zahl, sind sie auch dafür zu klein, fallen sie weg (gezählt).
+local MIN = { zahl = { 90, 50 }, ring = { 110, 110 }, balken_w = { 140, 40 }, balken_s = { 50, 110 }, kurve = { 180, 90 },
+  status = { 120, 40 } }
+-- wie Z.layout: kompakt = flacher als 0,5; s = Massstab; Vollbild L.sb = floor(44 * s), Kompakt-Leiste floor(36 * s)
+local function oben(W, H)
+  if H < W * 0.5 then return floor(36 * min(W / 784, H / 316)) end
+  return floor(44 * min(W / 800, H / 480))
+end
+function P.umrechnen(a, W, H)
+  local ts, tz = oben(a.breite, a.hoehe), oben(W, H)
+  local fx, fy = W / a.breite, (H - tz) / max(1, a.hoehe - ts)
+  local neu, weg = { breite = a.breite, hoehe = a.hoehe, plaetze = {}, angepasst = true }, 0
+  local function passt(d, b, h)
+    local m = MIN[d]
+    return m and b >= floor(m[1] * W / 800 + 0.5) and h >= floor(m[2] * W / 800 + 0.5)
+  end
+  for _, p in ipairs(a.plaetze) do
+    local x0, x1 = floor(p.x * fx + 0.5), floor((p.x + p.b) * fx + 0.5)
+    local y0 = tz + floor((max(p.y, ts) - ts) * fy + 0.5)
+    local y1 = tz + floor((max(p.y + p.h, ts) - ts) * fy + 0.5)
+    x0, x1, y0, y1 = max(0, x0), min(W, x1), max(tz, y0), min(H, y1)
+    local b, h, d = x1 - x0, y1 - y0, p.dar
+    if not passt(d, b, h) then d = "zahl" end
+    if passt(d, b, h) then
+      local q = setmetatable({ x = x0, y = y0, b = b, h = h, dar = d }, { __index = p })
+      neu.plaetze[#neu.plaetze + 1] = q
+    else
+      weg = weg + 1
+    end
+  end
+  return neu, weg
+end
+
 return P

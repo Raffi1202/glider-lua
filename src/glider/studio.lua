@@ -329,22 +329,38 @@ local function inCfg(sd, key, e, ueber, opt)
   ueber[b[5]] = e.bma ~= false
 end
 
+-- Suchorte der Studio-Datei (Auftrag Studio-Layout R1), in dieser Reihenfolge. .funke.lua und Info bleiben in S.PFAD.
+S.ORTE = { "SD:/scripts/studio/", "RADIO:/scripts/studio/" }   -- nach S.PFAD (SCRIPTS:/studio/)
+
+-- R2: ausdrückliche Wahl im Widget-Menü (w.studioWahl, voller Pfad) vor <Kennung>.glider.lua an den drei Orten
 local function liesDateien(z)
-  local sd = z.sd
-  local p = S.PFAD .. z.kennung .. "." .. S.LUA
-  local d, grund = studioLaden(p .. ".lua", S.FORMAT)
+  local sd, d, grund, quelle = z.sd, nil, "fehlt", nil
+  local wahl = z.w.studioWahl
+  sd.wahl = "auto"
+  if type(wahl) == "string" and wahl ~= "" then
+    d, grund = studioLaden(wahl, S.FORMAT)
+    if d ~= nil or grund ~= "fehlt" then sd.wahl, quelle = "menue", wahl else sd.wahlFehlt = true end
+  end
+  if sd.wahl == "auto" then
+    for i = 0, #S.ORTE do
+      local p = (i == 0 and S.PFAD or S.ORTE[i]) .. z.kennung .. "." .. S.LUA .. ".lua"
+      d, grund = studioLaden(p, S.FORMAT)
+      if grund ~= "fehlt" then quelle = p break end
+    end
+  end
   if d == nil and grund == "fehlt" then
     -- Übergang 0.5.0: alte Studio-Datei <Kennung>.segler.lua (bis 0.4.0) lesen, wenn die neue fehlt
     local alt = S.PFAD .. z.kennung .. ".segler.lua"
-    local d2, g2 = studioLaden(alt, S.FORMAT)
+    local d2 = studioLaden(alt, S.FORMAT)
     if d2 ~= nil then
-      d, grund = d2, nil
+      d, grund, quelle = d2, nil, alt
       print("Glider Studio: old studio file " .. z.kennung .. ".segler.lua found, please re-transfer")
     end
   end
+  sd.quelle = quelle or ""
   if d == nil then
     sd.status = grund
-    if grund ~= "fehlt" then print("Glider Studio: " .. z.kennung .. ".glider.lua: " .. grund) end
+    if grund ~= "fehlt" then print("Glider Studio: " .. tostring(quelle) .. ": " .. grund) end
     return
   end
   sd.status = "geladen"
@@ -677,17 +693,9 @@ local function infoSchreiben(z, sitzung)
     ((okP and type(pfad) == "string") and ('  "modellPfad": ' .. js(pfad) .. ',\n') or "") ..
     '  "funke": ' .. js(ver.board) .. ',\n  "ethos": ' .. js(ver.version) .. ',\n' ..
     '  "fenster": [ ' .. table.concat(fe, ", ") .. ' ],\n  "studioDatei": ' .. st .. ',\n' ..
-    '  "sensoren": [\n    ' .. table.concat(se, ",\n    ") .. '\n  ]\n}\n'
-  local p = S.PFAD .. z.kennung .. "." .. S.LUA .. ".info.json"
-  if sitzung[p] == t then return end
-  pcall(os.mkdir, "SCRIPTS:/studio")
-  local okO, f = pcall(io.open, p, "w")
-  if okO and f then
-    local okW = pcall(f.write, f, t)
-    f:close()
-    if okW then sitzung[p] = t return end
-  end
-  print("Glider Studio: Info-Datei nicht geschrieben")
+    '  "sensoren": [\n    ' .. table.concat(se, ",\n    ") .. '\n  ]'
+  -- Die Felder studioQuelle … hinweis hängen vom Fenster ab: der Kern schreibt die Datei (K: infoNach)
+  sd.infoKopf, sd.infoPfad = t, S.PFAD .. z.kennung .. "." .. S.LUA .. ".info.json"
 end
 
 -- Ein Schritt. w.sz2 = Zwischenstand. Rückgabe true = fertig (w.sd steht, w.sz2 = nil).
@@ -713,8 +721,9 @@ function S.schritt(w, F, sitzung)
   elseif s == 7 then if not quellenSchritt(z) then z.schritt = 7 end
   elseif s == 8 then if not sensorSchritt(z) then z.schritt = 8 end
   elseif s == 9 then
-    w.sd, z.d, z.f = z.sd, nil, nil
     pcall(infoSchreiben, z, sitzung)
+    w.sd, z.d, z.f = z.sd, nil, nil
+    w.infoNeu, w.aGr = true, nil
     w.sz2 = nil
     return true
   end

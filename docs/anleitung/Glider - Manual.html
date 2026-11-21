@@ -47,12 +47,12 @@
 </head>
 <body>
 <h1>Glider</h1>
-<div class="unter">Flight display for gliders and electric gliders · Manual · Version 0.5.0 · 21 Nov 2026</div>
+<div class="unter">Flight display for gliders and electric gliders · Manual · Version 0.6.0 · 22 Nov 2026</div>
 <div class="bild schmal"><img src="../bilder-simulator/Glider - Sim 800x480 12 Englisch.png" alt="Glider on the radio"></div>
 <p><b>Glider</b> is a display (a “widget”) for FrSky radios with Ethos and a colour screen. On a full screen it shows vario,
 altitude, flight time, batteries and link, detects launch, release height and thermals and announces them. Every flight
 goes into a list with a summary, and you are warned when altitude, battery or link leave a limit you set.</p>
-<div class="kasten"><b>Test status (version 0.5.0):</b> Random test and 37 test runs in the Ethos simulator (X18RS, Ethos 26.2.0)
+<div class="kasten"><b>Test status (version 0.6.0):</b> Random test and 37 test runs in the Ethos simulator (X18RS, Ethos 26.2.0)
 passed, including settings and flight list after an update. Full screen 800 × 480 tested directly, 640 × 360, 480 × 320 and
 480 × 272 simulated; compact view 784 × 316 directly, 630 × 258 and 472 × 210 simulated. On a real radio (X18RS, Ethos
 26.2.0): start, three pages and announcements (0.1.1), sensor search with 48 sensors and reload (0.1.3/0.1.4).
@@ -65,7 +65,7 @@ passed, including settings and flight list after an update. Full screen 800 × 4
 <li>A model with working telemetry and sensors already discovered (Model › Telemetry › Discover new sensors).</li>
 <li>A vario with altitude and climb. Without a vario there is no flight detection, release height or thermal.</li>
 <li>A computer with FrSky Suite and a USB cable.</li>
-<li>The file <code>Glider-0.5.0.zip</code>. It is inside <code>Glider-0.5.0-share.zip</code> next to this manual. Unpack only the outer ZIP, not the inner one.</li>
+<li>The file <code>Glider-0.6.0.zip</code>. It is inside <code>Glider-0.6.0-share.zip</code> next to this manual. Unpack only the outer ZIP, not the inner one.</li>
 </ul>
 
 <h2>2. Install</h2>
@@ -74,7 +74,7 @@ passed, including settings and flight list after an update. Full screen 800 × 4
 <li>The radio shows a choice. Select <b>Ethos Suite</b>.</li>
 <li>Open <b>FrSky Suite</b> on the computer. The radio appears at the top.</li>
 <li>Click <b>Lua-Bibliothek</b> (Lua library), then <b>Von lokaler ZIP installieren</b> (install from local ZIP).</li>
-<li>Select <code>Glider-0.5.0.zip</code>. The Suite copies everything into the folder <code>scripts/glider/</code> on the radio.</li>
+<li>Select <code>Glider-0.6.0.zip</code>. The Suite copies everything into the folder <code>scripts/glider/</code> on the radio.</li>
 <li>Unplug the cable and restart the radio.</li>
 </ol>
 <p class="klein">Without the Suite: connect the radio as “USB storage” and copy the folder <code>glider</code> from the ZIP into the
@@ -383,8 +383,14 @@ as before.</p>
 <div><img src="../bilder-simulator/Glider - Sim 800x480 34 Studio Beispiel.png" alt="studio full screen"><div class="t">Own layout in full screen (replaces page 1)</div></div>
 </div>
 <ul>
+<li><b>Where the file may lie (0.6.0):</b> Glider looks in <code>scripts/studio/</code> of the script location, on the SD card
+(<code>SD:/scripts/studio/</code>) and in the radio memory (<code>RADIO:/scripts/studio/</code>), in this order.</li>
+<li><b>Which file:</b> The file starting with the model id (<code>…glider.lua</code>, see above) is taken automatically. If the name does not match the model,
+choose the file in the widget menu under <b>Studio layout</b> (all <code>*.glider.lua</code> of the three places, with the
+place in brackets). A choice in the menu wins over the model name; <b>automatic (model name)</b> goes back.</li>
 <li><b>Where it applies:</b> The file can hold one arrangement for the compact view and one for full screen. If the size
-matches the screen exactly, Glider draws it. In full screen it replaces page 1 only; power and flights stay, as does the
+matches the screen exactly, Glider draws it. Otherwise it takes the view with the most similar aspect ratio and scales it
+once to the window (note “Studio: view 800x480 adapted” for 5 s). Places that get too small are shown as number or left out. In full screen it replaces page 1 only; power and flights stay, as does the
 top bar.</li>
 <li><b>Limits:</b> Warning and alarm apply per value for the whole model, no matter how or how often the value is shown. A
 limit missing in the file keeps the factory limit. Sensors and channels can have limits too; they report with a tone.</li>
@@ -397,13 +403,15 @@ radio, window sizes and the sensor list.</li>
 </ul>
 <table>
 <tr><th>Note at the bottom (8 s, then “!” top right)</th><th>Meaning</th><th>What to do</th></tr>
-<tr><td>“Studio file broken - default”</td><td>The file is damaged or not allowed. Glider works as without studio.</td><td>Transfer it again from the studio.</td></tr>
-<tr><td>“Studio file too new - update the Lua”</td><td>The studio wrote a newer format.</td><td>Update Glider (chapter 10).</td></tr>
+<tr><td>“Studio: file faulty (syntax/content)” (stays at the bottom)</td><td>The file is damaged or not allowed. Glider works as without studio.</td><td>Transfer it again from the studio.</td></tr>
+<tr><td>“Studio: no matching view” (stays)</td><td>The file has no usable view for this window.</td><td>Add a view in the studio.</td></tr>
+<tr><td>“Studio: chosen file missing” (stays)</td><td>The file chosen in the menu is gone.</td><td>Choose again or set automatic.</td></tr>
+<tr><td>“Studio: file faulty (too new)”</td><td>The studio wrote a newer format.</td><td>Update Glider (chapter 10).</td></tr>
 <tr><td>“Studio file: 3 errors”</td><td>Single entries were invalid. They use the default, the rest applies.</td><td>Check in the studio and transfer again.</td></tr>
 <tr><td>“Changes on the radio discarded”</td><td>The file with the changes made on the radio was damaged.</td><td>Make the changes in the menu again.</td></tr>
 <tr><td>“Change not saved”</td><td>The menu change could not be written (SD card full or write protected).</td><td>Check the SD card.</td></tr>
 </table>
 
-<p class="klein">Glider version 0.5.0 · 21 Nov 2026</p>
+<p class="klein">Glider version 0.6.0 · 22 Nov 2026</p>
 </body>
 </html>

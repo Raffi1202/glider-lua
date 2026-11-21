@@ -18,16 +18,16 @@ Deutsch und Englisch.
 - **Akkus** mit Zellensensor oder nur Gesamtspannung; Grenzen in zwei Stufen (Warnung orange, Alarm rot mit Ton und Ansage).
 - **Flugliste** mit Übersicht; jeder Flug einzeln löschbar.
 - **Lua-Studio:** Eine Datei je Modell gestaltet die Anzeige frei; ohne sie arbeitet alles wie bisher.
-- **Neu in 0.5.0:** umbenannt von **Segler** in **Glider** (nicht rückwärts verträglich: Widget in jedem Modell neu wählen; Studio-Dateien `<Kennung>.glider.lua`, alte `<Kennung>.segler.lua` werden übergangsweise gelesen). Siehe [Update von Segler](wiki/de/Installation.md#update-von-segler-040-und-älter).
+- **Neu in 0.6.0:** Studio-Layout wird immer gefunden (Suche SD + Funke, Wahl im Menü «Studio-Layout», Umrechnen anderer Fenstergrössen, Hinweiszeile). **Neu in 0.5.0:** umbenannt von **Segler** in **Glider** (nicht rückwärts verträglich: Widget in jedem Modell neu wählen; Studio-Dateien `<Kennung>.glider.lua`, alte `<Kennung>.segler.lua` werden übergangsweise gelesen). Siehe [Update von Segler](wiki/de/Installation.md#update-von-segler-040-und-älter).
 - **0.4.0:** «Alarm auch bei Motor aus» je Wert (Menü und Lua-Studio, ab Werk ein); eine Lua-Studio-Grenze
   ohne Zahl-Stufe schaltet nie ab; Speicherformat 2 (Einstellungen aus 0.3.x bleiben).
 
-**Stand:** öffentliche Vorabversion (Public Beta). 0.5.0 ist im Ethos-Simulator getestet; der Sendertest an der X18RS
+**Stand:** öffentliche Vorabversion (Public Beta). 0.6.0 ist im Ethos-Simulator getestet; der Sendertest an der X18RS
 folgt. Nutzung auf eigenes Risiko. Lizenz: GPL-3.0, siehe unten.
 
 ## Schnellstart
 
-1. Aus dem neusten **Release** `Glider-0.5.0.zip` laden (`Glider-0.5.0-share.zip` enthält zusätzlich die Anleitungen).
+1. Aus dem neusten **Release** `Glider-0.6.0.zip` laden (`Glider-0.6.0-share.zip` enthält zusätzlich die Anleitungen).
 2. Sender per USB anschliessen, am Sender **Ethos Suite** wählen und auf dem Computer die **FrSky Suite** öffnen.
 3. Suite › **Lua-Bibliothek** › **Von lokaler ZIP installieren** › ZIP wählen. Danach den Sender neu starten.
 4. Modell › Bildschirme › **+** › Layout **Vollbild** (oder ein Feld mit Leisten) › ins Feld tippen › Widget **Glider**.
@@ -45,6 +45,13 @@ Ohne Suite: Sender als USB-Speicher anschliessen und den Ordner `glider` nach `s
 | Fehler und Wünsche | GitHub › Issues › New issue |
 | Versionen | [`CHANGELOG.md`](CHANGELOG.md) |
 
+## Studio-Layout wird nicht angezeigt?
+
+1. Die Datei nach `scripts/studio/` kopieren (SD-Karte oder Funkenspeicher, beides geht).
+2. Passt der Dateiname nicht zum Modellnamen: Widget-Menü › **Studio-Layout** › Datei wählen.
+3. Die Hinweiszeile unten im Widget nennt den Grund für die Standardanzeige (Datei fehlerhaft, keine passende Ansicht, gewählte Datei fehlt).
+4. Die Info-Datei `scripts/studio/<Kennung>.glider.info.json` zeigt `studioQuelle`, `studioWahl` und `hinweis`.
+
 ## Sender und Stand der Erprobung
 
 | Display | Sender | Stand |
@@ -56,7 +63,7 @@ Ohne Suite: Sender als USB-Speicher anschliessen und den Ordner `glider` nach `s
 
 Am echten X18RS getestet bis 0.3.0: Start, Seiten und Ansagen, Sensorsuche mit 48 Sensoren, Kompaktansicht mit
 Live-Telemetrie, Update von 0.1.4, die Lua-Studio-Datei (Beispiel, kaputte Datei, 10 Modellwechsel). Am Sender noch
-nicht getestet: alles Neue aus 0.3.1, 0.4.0 und 0.5.0, ein echter Flug, alle Sender ausser der X18RS. Elektrik und Flüge gibt
+nicht getestet: alles Neue aus 0.3.1, 0.4.0, 0.5.0 und 0.6.0, ein echter Flug, alle Sender ausser der X18RS. Elektrik und Flüge gibt
 es nur im Vollbild. Der Gasgeber wird als «S1» gesucht; bei manchen Sendern im Menü von Hand wählen.
 
 ## Wo liegt was

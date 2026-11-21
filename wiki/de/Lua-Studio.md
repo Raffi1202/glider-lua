@@ -13,3 +13,10 @@ Einzelheiten: Anleitung Kapitel 12.
 
 ---
 [← Start](../Home.md) | [← Zurück](Alarme.md) | [Weiter →](FAQ.md)
+
+## Studio layout not showing? (Studio-Layout wird nicht angezeigt?)
+
+- Die Datei nach `scripts/studio/` auf der SD-Karte oder im Funkenspeicher kopieren; Glider sucht an beiden Orten (0.6.0).
+- Dateiname passt nicht zum Modell: Widget-Menü › **Studio-Layout** › Datei wählen.
+- Die Hinweiszeile unten nennt den Grund der Standardanzeige; die Info-Datei hat `studioQuelle`, `studioWahl`, `hinweis`.
+- Andere Fenstergrösse: Glider rechnet die ähnlichste Ansicht um (Hinweis «Studio: Ansicht 800x480 angepasst»).

@@ -3,6 +3,21 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.6.0 (22 Nov 2026, pre-release)
+
+- **Studio layout is always found.** The studio file is searched in `SCRIPTS:/studio/`, `SD:/scripts/studio/` and
+  `RADIO:/scripts/studio/` (in this order, same folder only once). `.funke.lua` and the info file stay in `SCRIPTS:/studio/`.
+- **Widget menu › Studio layout:** choose any `*.glider.lua` of the three places (place in brackets) or
+  "automatic (model name)". The choice wins over the model name. Stored at the end of the widget storage (storage
+  format 3); updating from 0.5.0 keeps everything, the choice starts at "automatic".
+- **Other window size:** if no view matches exactly, the view with the most similar aspect ratio (tie: larger area) is
+  scaled once to the window, below the own top bar. Too small places become numbers or are left out (counted in the note).
+  Note "Studio: view 800x480 adapted" for 5 s.
+- **Note line at the bottom** when the default display is shown although a file was found or chosen:
+  "Studio: file faulty (…)", "Studio: no matching view", "Studio: chosen file missing".
+- **Info file:** new fields at the end: `studioQuelle`, `studioWahl`, `ansichtGenutzt`, `angepasst`, `hinweis`.
+- Unchanged: studio format 1/2, alarms and announcements, motor-off rule, command limits.
+
 ## 0.5.0 (21 Nov 2026, pre-release)
 
 - **Renamed from Segler to Glider – breaking: old models must re-add the widget; Studio files must be renamed or re-transferred.**
