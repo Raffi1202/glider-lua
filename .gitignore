@@ -19,3 +19,7 @@ test/stand-*/
 
 # local working notes
 STAND.md
+
+# internal planning sheets, local only
+docs/konzept/
+docs/entwicklung/

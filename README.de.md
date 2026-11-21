@@ -67,7 +67,6 @@ es nur im Vollbild. Der Gasgeber wird als «S1» gesucht; bei manchen Sendern im
 | Anleitung (PDF) und ihre Quelle (HTML) | `docs/`, `docs/anleitung/` |
 | Bilder aus dem Ethos-Simulator | `docs/bilder-simulator/` |
 | Texte aller Sprachansagen | `docs/Sprachansagen.md` |
-| Konzept, Anforderungen und Entscheide | `docs/konzept/`, `docs/entwicklung/` |
 | Abläufe für den Simulator, feste Testfälle | `test/` |
 | Beschreibung für Lua-Studio, Beispiel-Datei | `studio/` |
 
