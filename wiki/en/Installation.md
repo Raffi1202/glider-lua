@@ -23,6 +23,7 @@ In an even smaller frame Glider only shows "Area too small".
 **Breaking:** the widget was renamed from **Segler** to **Glider** in 0.5.0 (key and folder `glider` instead of `segler`, Studio file `<id>.glider.lua` instead of `<id>.segler.lua`).
 - Ethos sees Glider as a new widget: on every model, choose the widget **Glider** again in the screen frame. The settings stored in the old widget are not taken over; set them again (or let Lua-Studio transfer them).
 - Studio files: re-transfer them from Lua-Studio, or rename `<id>.segler.lua` to `<id>.glider.lua`. As a transition, Glider still reads an old `<id>.segler.lua` when no `<id>.glider.lua` exists and writes "old studio file found, please re-transfer" to the log.
+- **Copy your settings and flight list:** they are stored in `scripts/segler/daten/` (one file per model). Copy all files from `scripts/segler/daten/` to `scripts/glider/daten/` before you start Glider, otherwise Glider starts with default settings and an empty flight list. The assigned sensors and switches are kept in the model and come back when the widget key is changed or the sensors are searched again.
 - The old folder `scripts/segler` can be deleted after the switch.
 
 ## Update

@@ -22,6 +22,7 @@ Modell › Bildschirme › **+** › Layout **Vollbild** oder **ein Feld mit Kop
 **Achtung, nicht rückwärts verträglich:** Das Widget heisst ab 0.5.0 **Glider** statt **Segler** (Schlüssel und Ordner `glider` statt `segler`, Studio-Datei `<Kennung>.glider.lua` statt `<Kennung>.segler.lua`).
 - Ethos sieht Glider als neues Widget: In jedem Modell im Bildschirmfeld das Widget **Glider** neu wählen. Die Einstellungen des alten Widgets werden nicht übernommen; neu einstellen (oder mit Lua-Studio übertragen).
 - Studio-Dateien: aus Lua-Studio neu übertragen oder `<Kennung>.segler.lua` in `<Kennung>.glider.lua` umbenennen. Als Übergang liest Glider eine alte `<Kennung>.segler.lua`, solange keine `<Kennung>.glider.lua` da ist, und schreibt «old studio file found, please re-transfer» ins Log.
+- **Einstellungen und Flugliste mitnehmen:** Sie liegen in `scripts/segler/daten/` (eine Datei je Modell). Vor dem ersten Start von Glider alle Dateien aus `scripts/segler/daten/` nach `scripts/glider/daten/` kopieren, sonst startet Glider mit Werkeinstellungen und leerer Flugliste. Zugewiesene Sensoren und Schalter stehen im Modell und kommen zurück, wenn der Widget-Schlüssel getauscht oder die Sensoren neu gesucht werden.
 - Der alte Ordner `scripts/segler` kann nach dem Wechsel gelöscht werden.
 
 ## Update

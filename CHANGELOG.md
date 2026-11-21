@@ -13,6 +13,8 @@ The top section appears in the FrSky Suite as version note. From 0.4.0 on in Eng
 - Transition: if no `<id>.glider.lua` exists, an old `<id>.segler.lua` is read and the log shows
   "old studio file found, please re-transfer".
 - The English model type is now "Glider" (German stays "Segler").
+- Upgrading: settings and the flight list are stored in `scripts/segler/daten/`; copy these files to
+  `scripts/glider/daten/` before the first start (see wiki "Upgrading from Segler").
 
 ## 0.4.0 (21 Nov 2026, as Segler)
 
