@@ -402,6 +402,31 @@ do
     tostring(wz.sd.fehler))
 end
 
+-- 6e. Standard-Layout für alle Modelle (0.7.0): S1 nur Standard, S2 Modelldatei gewinnt, S3 Wahl gewinnt, S4 .funke.lua je Modell
+do
+  loesche()
+  local ST = S.PFAD .. "Standard.glider.lua"
+  local g = io.open(ST, "w") g:write("return { format = 1, einstellungen = { start_h = 22 } }") g:close()
+  local w1 = lauf()
+  fall("S1 nur Standard: geladen, studioWahl standard", w1.sd.status == "geladen" and w1.sd.wahl == "standard"
+    and w1.sd.quelle == ST and w1.sd.ueber.startH == 22)
+  kopiere(HIER .. "leer.lua", S.PFAD .. KENNUNG .. ".glider.lua")
+  local w2 = lauf()
+  fall("S2 Modelldatei gewinnt vor Standard", w2.sd.wahl == "auto" and w2.sd.quelle ~= ST and w2.sd.ueber.startH == F.standard().startH)
+  local w3 = { cfg = F.standard(), sp = 1, version = "0.7.0", fenster = {}, studioWahl = ST }
+  w3 = lauf(w3)
+  fall("S3 Wahl im Menü gewinnt", w3.sd.wahl == "menue" and w3.sd.quelle == ST)
+  os.remove(S.PFAD .. KENNUNG .. ".glider.lua")
+  local w4 = lauf()
+  w4.cfg = {} for k, v in pairs(w4.sd.ueber) do w4.cfg[k] = v end
+  w4.cfg.kap = 1500
+  schreib(w4, S, F, assert(loadfile("studiolad.lua"))(), KENNUNG)
+  local f4 = io.open(S.PFAD .. KENNUNG .. ".glider.funke.lua", "r")
+  fall("S4 Änderung am Sender nur im Modell (.funke.lua des Modells)", f4 ~= nil and io.open(S.PFAD .. "Standard.glider.funke.lua") == nil)
+  if f4 then f4:close() end
+  os.remove(ST)
+end
+
 -- 7. Kennung (2.1)
 fall("Kennung nach 2.1", S.kennung("Extra 330 6S") == "Extra_330_6S" and S.kennung("Möwe") == "M__we"
   and S.kennung("Goblin 700 (neu)") == "Goblin_700__neu_" and S.kennung("") == "modell"

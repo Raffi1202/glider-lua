@@ -357,6 +357,14 @@ local function liesDateien(z)
       print("Glider Studio: old studio file " .. z.kennung .. ".segler.lua found, please re-transfer")
     end
   end
+  if d == nil and grund == "fehlt" and sd.wahl == "auto" then
+    -- Standard-Layout für alle Modelle (Standard.glider.lua), nur wenn keine Modelldatei da ist; .funke.lua bleibt je Modell
+    for i = 0, #S.ORTE do
+      local p = (i == 0 and S.PFAD or S.ORTE[i]) .. "Standard." .. S.LUA .. ".lua"
+      d, grund = studioLaden(p, S.FORMAT)
+      if grund ~= "fehlt" then quelle, sd.wahl = p, "standard" break end
+    end
+  end
   sd.quelle = quelle or ""
   if d == nil then
     sd.status = grund

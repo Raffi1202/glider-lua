@@ -64,7 +64,9 @@ return function(w, F, A)
   -- Studio-Layout wählen (R2): alle *.glider.lua der drei Orte ohne .funke.lua, nur beim Öffnen des Menüs gesucht.
   -- Zeigt SCRIPTS: auf denselben Ordner wie SD: oder RADIO: (gleiche Dateiliste), erscheint der Ort nur einmal.
   if form.addChoiceField and A.studioWahl then
-    local wahl, pfade, gesehen = { { T.mAuto or "auto", 0 } }, {}, {}
+    -- «automatisch» zeigt in Klammern, was gerade gilt: Modellname oder Standard (alle Modelle)
+    local gilt = (w.sd and w.sd.wahl == "standard") and (T.mStandardKurz or "Standard") or (T.mModellname or "model name")
+    local wahl, pfade, gesehen = { { (T.mAutoKurz or "auto") .. " (" .. gilt .. ")", 0 } }, {}, {}
     for _, o in ipairs({ { "SCRIPTS:/studio/", "SCRIPTS" }, { "SD:/scripts/studio/", "SD" }, { "RADIO:/scripts/studio/", "RADIO" } }) do
       local ok, l = pcall(system.listFiles, o[1])
       if ok and type(l) == "table" then
@@ -79,7 +81,9 @@ return function(w, F, A)
           for _, d in ipairs(n) do
             if #pfade < 60 then
               pfade[#pfade + 1] = o[1] .. d
-              wahl[#wahl + 1] = { d:sub(1, -12) .. " (" .. o[2] .. ")", #pfade }
+              local nm = d:sub(1, -12)
+              if nm == "Standard" then nm = T.mStandardAlle or nm end
+              wahl[#wahl + 1] = { nm .. " (" .. o[2] .. ")", #pfade }
             end
           end
         end

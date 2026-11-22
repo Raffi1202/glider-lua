@@ -3,6 +3,15 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.7.0 (22 Nov 2026, pre-release)
+
+- **One layout for all models:** `Standard.glider.lua` (searched in the same three places) is used by every model that has
+  no own `<id>.glider.lua` and no explicit choice in the menu. Order: menu choice, model file, standard file, built-in
+  display. Changes on the radio stay per model (`<id>.glider.funke.lua`). A model named "Standard" uses its own file.
+- Widget menu › Studio layout: entry "Default (all models)"; "automatic" shows in brackets what applies (model name or
+  default). Info file: `studioWahl` "standard", `studioQuelle` the path of the standard file.
+- No new storage format, update without loss.
+
 ## 0.6.2 (22 Nov 2026, pre-release)
 
 - **At most 48 entries per list** in a studio file (`einstellungen`, `werte`, `grenzen`, also in `.funke.lua`), as
