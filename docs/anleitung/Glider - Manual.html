@@ -412,6 +412,9 @@ radio, window sizes and the sensor list.</li>
 <tr><td>“Change not saved”</td><td>The menu change could not be written (SD card full or write protected).</td><td>Check the SD card.</td></tr>
 </table>
 
+<h3>One layout for all models</h3>
+<p>One layout for all models: put <code>Standard.glider.lua</code> into <code>scripts/studio/</code> and every model without its own <code>&lt;id&gt;.glider.lua</code> and without a menu choice uses it. Order: menu choice, model file, <code>Standard.glider.lua</code>, built-in display. Changes on the radio stay per model. A model named “Standard” uses its own file. The menu entry is “Default (all models)”.</p>
+
 <p class="klein">Glider version 0.7.0 · 22 Nov 2026</p>
 </body>
 </html>

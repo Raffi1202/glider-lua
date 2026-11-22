@@ -49,6 +49,10 @@ follows. Use at your own risk. License: GPL-3.0, see below.
 3. Look at the note line at the bottom of the widget: it says why the default display is shown (file faulty, no matching view, chosen file missing).
 4. The info file `scripts/studio/<model id>.glider.info.json` shows `studioQuelle`, `studioWahl` and `hinweis`.
 
+## One layout for all models (from 0.7.0)
+
+One layout for all models: put `Standard.glider.lua` into `scripts/studio/` and every model without its own `<id>.glider.lua` and without a menu choice uses it. Order: menu choice, model file, `Standard.glider.lua`, built-in display. Changes on the radio stay per model (`<id>.glider.funke.lua`). A model named "Standard" uses its own file. The menu entry is "Default (all models)".
+
 ## Radios and test status
 
 | Display | Radios | Status |

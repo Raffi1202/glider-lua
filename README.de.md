@@ -52,6 +52,10 @@ Ohne Suite: Sender als USB-Speicher anschliessen und den Ordner `glider` nach `s
 3. Die Hinweiszeile unten im Widget nennt den Grund für die Standardanzeige (Datei fehlerhaft, keine passende Ansicht, gewählte Datei fehlt).
 4. Die Info-Datei `scripts/studio/<Kennung>.glider.info.json` zeigt `studioQuelle`, `studioWahl` und `hinweis`.
 
+## Ein Layout für alle Modelle (ab 0.7.0)
+
+Ein Layout für alle Modelle: Legt man `Standard.glider.lua` in `scripts/studio/`, nutzt jedes Modell ohne eigene `<Kennung>.glider.lua` und ohne Wahl im Menü dieses Layout. Reihenfolge: Wahl im Menü, Datei des Modells, `Standard.glider.lua`, eingebaute Anzeige. Änderungen am Sender bleiben je Modell (`<Kennung>.glider.funke.lua`). Ein Modell namens «Standard» nimmt seine eigene Datei. Im Menü «Studio-Layout» heisst der Eintrag «Standard (alle Modelle)».
+
 ## Sender und Stand der Erprobung
 
 | Display | Sender | Stand |

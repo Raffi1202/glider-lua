@@ -20,3 +20,7 @@ Einzelheiten: Anleitung Kapitel 12.
 - Dateiname passt nicht zum Modell: Widget-Menü › **Studio-Layout** › Datei wählen.
 - Die Hinweiszeile unten nennt den Grund der Standardanzeige; die Info-Datei hat `studioQuelle`, `studioWahl`, `hinweis`.
 - Andere Fenstergrösse: Glider rechnet die ähnlichste Ansicht um (Hinweis «Studio: Ansicht 800x480 angepasst»).
+
+## Ein Layout für alle Modelle (ab 0.7.0)
+
+Ein Layout für alle Modelle: Legt man `Standard.glider.lua` in `scripts/studio/`, nutzt jedes Modell ohne eigene `<Kennung>.glider.lua` und ohne Wahl im Menü dieses Layout. Reihenfolge: Wahl im Menü, Datei des Modells, `Standard.glider.lua`, eingebaute Anzeige. Änderungen am Sender bleiben je Modell (`<Kennung>.glider.funke.lua`). Ein Modell namens «Standard» nimmt seine eigene Datei. Im Menü «Studio-Layout» heisst der Eintrag «Standard (alle Modelle)».

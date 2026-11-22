@@ -20,3 +20,7 @@ Details: manual chapter 12.
 - File name does not match the model: widget menu › **Studio layout** › choose the file.
 - The note line at the bottom says why the default display is shown; the info file has `studioQuelle`, `studioWahl`, `hinweis`.
 - Window size differs from the view: Glider scales the most similar view (note "Studio: view 800x480 adapted").
+
+## One layout for all models (from 0.7.0)
+
+One layout for all models: put `Standard.glider.lua` into `scripts/studio/` and every model without its own `<id>.glider.lua` and without a menu choice uses it. Order: menu choice, model file, `Standard.glider.lua`, built-in display. Changes on the radio stay per model (`<id>.glider.funke.lua`). A model named "Standard" uses its own file. The menu entry is "Default (all models)".

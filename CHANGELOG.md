@@ -11,6 +11,8 @@ The top section appears in the FrSky Suite as version note. From 0.4.0 on in Eng
 - Widget menu › Studio layout: entry "Default (all models)"; "automatic" shows in brackets what applies (model name or
   default). Info file: `studioWahl` "standard", `studioQuelle` the path of the standard file.
 - No new storage format, update without loss.
+- Deutsch: Ein Layout für alle Modelle mit `Standard.glider.lua`. Reihenfolge: Wahl im Menü, Datei des Modells,
+  Standard-Datei, eingebaute Anzeige. Änderungen am Sender bleiben je Modell. Menüeintrag «Standard (alle Modelle)».
 
 ## 0.6.2 (22 Nov 2026, pre-release)
 
