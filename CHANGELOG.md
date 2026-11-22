@@ -3,6 +3,15 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.6.2 (22 Nov 2026, pre-release)
+
+- **At most 48 entries per list** in a studio file (`einstellungen`, `werte`, `grenzen`, also in `.funke.lua`), as
+  required by studio format 2 §7.2. Further entries are discarded and counted as errors ("Studio: n errors", `fehler`
+  in the info file).
+- **Tiles and bottom bar no longer come from Lua-Studio:** the settings k1–k3 (tiles of page 1) and l1–l3 (bottom bar)
+  were removed from `studio/beschreibung.json` (now 45 settings). They stay in the widget menu on the radio. A studio
+  view replaces page 1 anyway.
+
 ## 0.6.1 (22 Nov 2026, pre-release)
 
 - **Settings no longer stick after a layout change.** With a studio file the Lua wrote the studio values into its own

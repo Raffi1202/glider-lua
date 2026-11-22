@@ -392,6 +392,16 @@ do
   MAXB = math.max(alt, MAXB)
 end
 
+-- 6d. Format 2 §7.2: höchstens 48 Einträge je Liste; 60 Einstellungen -> 12 verworfen und als Fehler gezählt
+do
+  local e = {}
+  for i = 1, 60 do e[#e + 1] = "x" .. i .. " = 1" end
+  schreibeStudio("return { format = 1, einstellungen = { " .. table.concat(e, ", ") .. " } }")
+  local wz = lauf()
+  fall("60 Einstellungen: 12 verworfen, Fehler gezählt", wz.sd.status == "geladen" and wz.sd.fehler == 12,
+    tostring(wz.sd.fehler))
+end
+
 -- 7. Kennung (2.1)
 fall("Kennung nach 2.1", S.kennung("Extra 330 6S") == "Extra_330_6S" and S.kennung("Möwe") == "M__we"
   and S.kennung("Goblin 700 (neu)") == "Goblin_700__neu_" and S.kennung("") == "modell"

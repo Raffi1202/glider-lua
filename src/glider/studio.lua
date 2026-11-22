@@ -408,14 +408,23 @@ local JE_AUFRUF = 10
 
 -- Bis zu n Einträge der Tabelle t ab dem gemerkten Schlüssel z.ck an fn geben. true = Tabelle fertig.
 -- fn darf t nicht ändern (next über eine veränderte Tabelle ist nicht erlaubt).
-local function stueck(z, t, n, fn)
+-- wo gesetzt: Liste der Datei, höchstens MAX_LISTE Einträge (Format 2 §7.2); jeder weitere wird verworfen und als Fehler
+-- gezählt (wo = "" verwirft still, für den Durchgang ohne Fehlerzählung).
+local MAX_LISTE = 48
+local function stueck(z, t, n, fn, wo)
   if type(t) ~= "table" then z.ck = nil return true end
   local k = z.ck
+  if k == nil then z.cn = 0 end
   for _ = 1, n do
     local v
     k, v = next(t, k)
     if k == nil then z.ck = nil return true end
-    fn(k, v)
+    z.cn = z.cn + 1
+    if wo and z.cn > MAX_LISTE then
+      if wo ~= "" then fehler(z, wo, "mehr als " .. MAX_LISTE .. " Einträge, verworfen") end
+    else
+      fn(k, v)
+    end
   end
   z.ck = k
   return false
@@ -503,14 +512,14 @@ local function pruefeSchritt(z, holeF)
     sd.ueber, z.ck = ueber, nil
     z.ph = keineTabelle(z, z.d.einstellungen, "einstellungen") and 2 or 1
   elseif ph == 1 then                               -- Einstellungen der Studio-Datei
-    if stueck(z, z.d.einstellungen, viel, function(k, v) legeEintrag(z, "einstellungen", k, v) end) then z.ph = 2 end
+    if stueck(z, z.d.einstellungen, viel, function(k, v) legeEintrag(z, "einstellungen", k, v) end, "einstellungen") then z.ph = 2 end
   elseif ph == 2 then                               -- Basis ohne .funke.lua
     local basis = {}
     for k, v in pairs(sd.ueber) do basis[k] = v end
     sd.basis = basis
     z.ph = (z.f == nil or keineTabelle(z, z.f.einstellungen, "funke.einstellungen")) and 4 or 3
   elseif ph == 3 then                               -- Einstellungen aus .funke.lua
-    if stueck(z, z.f.einstellungen, viel, function(k, v) legeEintrag(z, "funke.einstellungen", k, v) end) then z.ph = 4 end
+    if stueck(z, z.f.einstellungen, viel, function(k, v) legeEintrag(z, "funke.einstellungen", k, v) end, "funke.einstellungen") then z.ph = 4 end
   elseif ph == 4 then                               -- Werte (6.4)
     z.felder = nil
     sd.werte = {}
@@ -519,21 +528,21 @@ local function pruefeSchritt(z, holeF)
     if stueck(z, z.d.werte, JE_AUFRUF, function(k, e)
       local r = wertAnpassung(z, k, e)
       if r then sd.werte[k] = r end
-    end) then z.ph = 6 end
+    end, "werte") then z.ph = 6 end
   elseif ph == 6 then
     -- Basis ohne .funke.lua (still, ohne Fehler zu zählen): daran misst das Schreiben an der Funke die Änderungen
     z.still = { stumm = true, w = z.w, sd = { fehler = 0, werte = sd.werte } }
     z.nurStudio = {}
     z.ph = (type(z.d.grenzen) == "table") and 7 or 9
   elseif ph == 7 then
-    if stueck(z, z.d.grenzen, viel, function(k, g) sammleEintrag(z.still, "", z.nurStudio, k, g) end) then z.ph = 8 end
+    if stueck(z, z.d.grenzen, viel, function(k, g) sammleEintrag(z.still, "", z.nurStudio, k, g) end, "") then z.ph = 8 end
   elseif ph == 8 then
     if stueck(z, z.nurStudio, JE_AUFRUF, function(k, g) anwendenEintrag(z.still, sd.basis, {}, {}, k, g) end) then z.ph = 9 end
   elseif ph == 9 then
     z.still, z.nurStudio, z.alle = nil, nil, {}
     z.ph = keineTabelle(z, z.d.grenzen, "grenzen") and 11 or 10
   elseif ph == 10 then
-    if stueck(z, z.d.grenzen, viel, function(k, g) sammleEintrag(z, "grenzen", z.alle, k, g) end) then z.ph = 11 end
+    if stueck(z, z.d.grenzen, viel, function(k, g) sammleEintrag(z, "grenzen", z.alle, k, g) end, "grenzen") then z.ph = 11 end
   elseif ph == 11 then
     z.ph = (z.f and type(z.f.grenzen) == "table") and 12 or 14
   elseif ph == 12 then
@@ -549,7 +558,7 @@ local function pruefeSchritt(z, holeF)
       end
     end) then z.ph = 13 end
   elseif ph == 13 then
-    if stueck(z, z.f.grenzen, viel, function(k, g) sammleEintrag(z, "funke.grenzen", z.alle, k, g) end) then z.ph = 14 end
+    if stueck(z, z.f.grenzen, viel, function(k, g) sammleEintrag(z, "funke.grenzen", z.alle, k, g) end, "funke.grenzen") then z.ph = 14 end
   elseif ph == 14 then
     sd.opt, sd.mon, sd.monKeys = {}, {}, {}
     sd.funkeAlt = z.f and type(z.f.grenzen) == "table" and z.f.grenzen or nil   -- für das Schreiben an der Funke
