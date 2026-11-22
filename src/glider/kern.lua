@@ -288,6 +288,12 @@ K._wertVon = wertVon
 local function studioAnwenden(w)
   local sd = w.sd
   if not (sd and sd.ueber) then return end
+  -- eigene Werte merken: in die Datei des Modells kommen sie, nicht die der Studio-Datei (sonst bleiben Studio-Werte
+  -- nach einem Layout-Wechsel oder ohne Studio-Datei stehen)
+  if w.cfgEigen == nil then
+    w.cfgEigen = {}
+    for k in pairs(sd.ueber) do w.cfgEigen[k] = w.cfg[k] end
+  end
   for k, v in pairs(sd.ueber) do w.cfg[k] = v end
   grenzen(w)
 end
@@ -973,11 +979,32 @@ local function testZustand(w, now)
   if not ok or not e then print(tostring(w.name) .. ": Fehler: Testzustand konnte nicht geschrieben werden " .. tostring(e)) end
 end
 
+-- Datei schreiben in fünf Aufrufen (Befehlsgrenze): 1 felder.lua laden und Verzeichnis bauen, 2 und 3 je die Hälfte
+-- der Einstellungen, 4 Zähler und Flüge, 5 schreiben. Ein Schritt je wakeup.
 local function schreibeDatei(w, now)
-  w.dateiOffen, w.dateiJetzt, w.tDatei = false, false, now
-  local ok, F = pcall(lade, "felder.lua")
+  local s = w.schreibS or 1
+  if s == 1 then
+    w.dateiOffen, w.dateiJetzt, w.tDatei = false, false, now
+    local ok, F = pcall(lade, "felder.lua")
+    if ok then pcall(F.feld, "modell") end                -- Verzeichnis jetzt bauen
+    w.schreibF, w.schreibS = ok and F or nil, 2
+    if ok then return false end
+  elseif s == 2 then
+    local ok, z = pcall(w.schreibF.zeilen, w, 1)
+    w.schreibZ, w.schreibS = ok and z or nil, 3
+    if ok then return false end
+  elseif s == 3 and w.schreibZ then
+    local ok = pcall(w.schreibF.zeilen, w, 2, w.schreibZ)
+    w.schreibS = ok and 4 or 5
+    if ok then return false end
+  elseif s == 4 and w.schreibZ then
+    local ok, text = pcall(w.schreibF.zeilen, w, 3, w.schreibZ)
+    w.schreibT, w.schreibS, w.schreibZ = ok and text or nil, 5, nil
+    if ok then return false end
+  end
   local okS, erfolg = false, false
-  if ok then okS, erfolg = pcall(F.schreibeDatei, w) end
+  if w.schreibT then okS, erfolg = pcall(w.schreibF.schreibeText, w.schreibT) end
+  w.schreibS, w.schreibF, w.schreibT, w.schreibZ = nil, nil, nil, nil
   if not (okS and erfolg) then
     if not w.dateiFehler then print(tostring(w.name) .. ": Fehler: Datei konnte nicht geschrieben werden") end
     w.dateiFehler = true
@@ -1044,7 +1071,9 @@ function K.wecke(w)
     if w.hinweis and now >= w.hinweisBis then w.hinweis = nil end
     -- laufenden Flug höchstens alle DAUER_S Sekunden sichern
     if w.flug and now - (w.tDauer or now) >= DAUER_S then w.dateiOffen = true end
-    if w.dateiOffen and (w.dateiJetzt or now - (w.tDatei or -100) >= 2) then
+    if w.schreibS then
+      if not (w.sdAuf or w.sucheAktiv) then schreibeDatei(w, now) end   -- nie im selben Aufruf wie Studio/Suche
+    elseif w.dateiOffen and (w.dateiJetzt or now - (w.tDatei or -100) >= 2) and not (w.sdAuf or w.sucheAktiv) then
       w.tDauer = now
       schreibeDatei(w, now)
     end
@@ -1187,21 +1216,29 @@ infoNach = function(w)
   print("Glider Studio: Info-Datei nicht geschrieben")
 end
 
--- Hinweis zur Studio-Datei: Band unten (24 px, über den Plätzen), danach «!» oben rechts.
--- w.sdZeile (R4): Standardanzeige trotz Datei, Grund steht dauernd unten.
+-- Hinweis zur Studio-Datei (A1: verdeckt nie Werte). Er steht in der eigenen Kopfzeile: Kompakt in der Leiste oben
+-- anstelle der Pillen, Vollbild in der Meldezeile unter der Statusleiste. Warnungen, Alarme und Ereignis-Hinweise gehen
+-- vor. w.sdZeile (R4): Standardanzeige trotz Datei, Grund bleibt stehen. Danach «!» in der Kopfzeile.
 local function studioBand(w, L)
-  local C = Z.C
-  if w.sdZeile and not w.A then
-    Z.rechteck(0, L.H - 20, L.W, 20, C.dunkel)
-    Z.text(L, L.W / 2, L.H - 10, w.sdZeile, 12 / (1.25 * L.s), C.orange, CENTERED, L.W - 12)
-  end
-  local t = w.sdHinweis
-  if not t then return end
-  if (w.tL or 0) < (w.sdHinweisBis or 0) then
-    Z.rechteck(0, L.H - 24, L.W, 24, C.dunkel)
-    Z.text(L, L.W / 2, L.H - 12, t, 14 / (1.25 * L.s), C.orange, CENTERED, L.W - 12)
-  elseif not w.sdNurBand then
-    Z.text(L, L.W - 6, 10, "!", 16 / (1.25 * L.s), C.orange, RIGHT)
+  local C, s, W = Z.C, L.s, L.W
+  local t = nil
+  if w.sdZeile and not w.A then t = w.sdZeile
+  elseif w.sdHinweis and (w.tL or 0) < (w.sdHinweisBis or 0) then t = w.sdHinweis end
+  local frei = (w.nAktiv or 0) == 0 and not w.hinweis
+  if t and frei then
+    if L.kompakt then
+      local sb = floor(36 * s)
+      local x0, x1 = W * 0.22, W * 0.76                 -- zwischen Zustand und Empfang
+      local ph = max(18, floor(sb - 10 * s))
+      Z.rund(x0, floor((sb - ph) / 2), x1 - x0, ph, ph / 2, C.dunkel)
+      Z.text(L, (x0 + x1) / 2, sb / 2, t, 15, C.orange, CENTERED, x1 - x0 - 12 * s)
+    else
+      Z.rund(L.gp, L.top, W - 2 * L.gp, L.mh, 8 * s, C.dunkel)
+      Z.text(L, W / 2, L.top + L.mh / 2, t, 15, C.orange, CENTERED, W - 2 * L.gp - 16 * s)
+    end
+  elseif (t or (w.sdHinweis and not w.sdNurBand)) then
+    local y = L.kompakt and floor(18 * s) or L.top + L.mh / 2
+    Z.text(L, L.kompakt and W * 0.77 or W - 10 * s, y, "!", 16, C.orange, L.kompakt and LEFT or RIGHT)
   end
 end
 
@@ -1401,6 +1438,20 @@ function K.menue(w)
     studioWahl = function(p)                        -- R2: Wahl im Menü, gespeichert am Ende des Widget-Speichers
       if p == (w.studioWahl or "") then return end
       w.studioWahl = p
+      -- alles vom bisherigen Layout zurücksetzen: Einstellungen und Grenzen auf den Stand ohne Studio (Datei des Modells),
+      -- Sensoren und Schalter bleiben; Zustände, Min/Max, Kurven und Meldungen der Studio-Grenzen weg
+      local werk = F.standard()
+      for _, g in ipairs(F.gruppen) do
+        for _, f in ipairs(g[2]) do if f[2] == "q" then werk[f[1]] = w.cfg[f[1]] end end
+      end
+      w.cfg, w.cfgEigen = werk, nil
+      local flug, liste, dauer = w.flug, w.liste, w.dauer   -- laufender Flug, Flüge und Zähler bleiben unverändert
+      pcall(F.lies, w, true)
+      w.flug, w.liste, w.dauer = flug, liste, dauer
+      grenzen(w)
+      for k in pairs(w.meld) do if k:match("^s[AW]%d") then w.meld[k] = nil end end
+      w.gst, w.zs, w.A, w.pVorb, w.aGr, w.L = {}, {}, nil, nil, nil, nil
+      w.sdHinweis, w.sdHinweis0, w.sdNurBand = nil, nil, nil
       w.sd, w.sdAuf, w.sz2, w.sdZeile = nil, true, nil, nil
       if model and model.dirty then pcall(model.dirty) end
     end,
@@ -1422,6 +1473,7 @@ function K.lies(w)
   w.gelesen = F.lies(w)
   if (w.studioWahl or "") ~= vorher and not w.sdAuf then w.sd, w.sdAuf, w.sz2, w.sdZeile = nil, true, nil, nil end
   w.autoOffen = not w.gelesen
+  w.cfgEigen = nil                                 -- frisch gelesen: das sind die eigenen Werte
   studioAnwenden(w)                                -- Studio-Datei vor Widget-Speicher und daten/ (Abschnitt 9)
   grenzen(w)
   w.seite = clamp(w.cfg.startSeite or 1, 1, SEITEN)
@@ -1430,6 +1482,12 @@ end
 function K.schreibe(w)
   local F = lade("felder.lua")
   F.schreibe(w)
+  -- Ethos speichert das Modell (Menü zu, Modellwechsel, Ausschalten): offenes Schreiben der Datei jetzt abschliessen
+  if w.dateiOffen or w.schreibS then
+    w.schreibS, w.schreibF, w.schreibT, w.schreibZ = nil, nil, nil, nil
+    w.dateiOffen, w.dateiJetzt = false, false
+    pcall(F.schreibeDatei, w)
+  end
 end
 
 return K

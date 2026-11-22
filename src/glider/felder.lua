@@ -401,12 +401,21 @@ function M.schreibe(w)
 end
 
 -- Zahlen, Texte, dauerhafte Werte, Flugliste und laufender Flug in die Datei. Gibt true zurück, wenn geschrieben.
-function M.schreibeDatei(w)
+-- Text der Datei in Teilen (Befehlsgrenze): teil 1 und 2 je die Hälfte der Einstellungen (Tabelle z), teil 3 Zähler
+-- und Flüge (fertiger Text). Ohne teil alles in einem Aufruf.
+function M.zeilen(w, teil, z)
+  if teil == 3 then return M.zeilen2(w, z) end
   local c = w.cfg
-  local z = { "# " .. tostring(w.name) .. ": Einstellungen, Flugliste und laufender Flug dieses Modells" }
-  for _, name in ipairs(M.folge) do
+  local n = #M.folge
+  local von, bis = 1, n
+  if teil == 1 then bis = n // 2 elseif teil == 2 then von = n // 2 + 1 end
+  if teil ~= 2 then z = { "# " .. tostring(w.name) .. ": Einstellungen, Flugliste und laufender Flug dieses Modells" } end
+  for i = von, bis do
+    local name = M.folge[i]
     local f = M.feld(name)
     local v = c[name]
+    local e = w.cfgEigen                              -- mit Studio-Datei: eigene Werte statt der Studio-Werte
+    if e and e[name] ~= nil then v = e[name] end
     if f and f[2] == "b" then
       z[#z + 1] = name .. "=" .. (v and "1" or "0")
     elseif f and f[2] == "t" then
@@ -415,6 +424,11 @@ function M.schreibeDatei(w)
       z[#z + 1] = name .. "=" .. string.format("%d", math.floor(v))
     end
   end
+  if teil then return z end
+  return M.zeilen2(w, z)
+end
+
+function M.zeilen2(w, z)
   local namen = {}
   for k, x in pairs(w.dauer or {}) do
     if type(k) == "string" and type(x) == "number" and x == x then namen[#namen + 1] = k end
@@ -423,12 +437,22 @@ function M.schreibeDatei(w)
   for _, k in ipairs(namen) do z[#z + 1] = "d_" .. k .. "=" .. string.format("%.2f", w.dauer[k]) end
   for _, fl in ipairs(w.liste or {}) do z[#z + 1] = "f=" .. M.flugText(fl) end
   if w.flug then z[#z + 1] = "o=" .. M.flugText(w.flug) end
+  return table.concat(z, "\n") .. "\n"
+end
+
+-- Fertigen Text in die Datei des Modells schreiben. Gibt true zurück, wenn geschrieben.
+function M.schreibeText(text)
   if os and os.mkdir then pcall(os.mkdir, "daten") end
   local ok, f = pcall(io.open, M.datei(), "w")
   if not ok or not f then return false end
-  local okw = pcall(f.write, f, table.concat(z, "\n") .. "\n")
+  local okw = pcall(f.write, f, text)
   pcall(f.close, f)
   return okw
+end
+
+-- in einem Aufruf (Mac-Tests und Rückfall); der Kern nimmt die drei Schritte
+function M.schreibeDatei(w)
+  return M.schreibeText(M.zeilen(w))
 end
 
 return M

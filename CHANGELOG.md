@@ -3,6 +3,21 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.6.1 (22 Nov 2026, pre-release)
+
+- **Settings no longer stick after a layout change.** With a studio file the Lua wrote the studio values into its own
+  data file; after choosing another layout (or removing the studio file) they stayed. The data file now keeps the own
+  values. Changing the layout in the menu resets settings, limits, colours, min/max and studio alarms to the state
+  without studio and then applies the new file. The running flight, flight list and totals stay.
+- **Studio notes never cover values.** The note ("Studio: view 800x480 adapted", "Studio: file faulty (…)") is shown in
+  the own top bar (compact view) or message line (full screen) instead of over the bottom row. Warnings, alarms and event
+  notes keep priority.
+- **Command limit in every wakeup:** writing the data file is split into five steps and never runs together with a
+  studio or search step (measured max. 4,718 instead of 9,677 commands). Pending data is written completely when Ethos
+  saves the model.
+- Test fixture for the restart test rebuilt for the `glider` folder (the "data not read after restart" finding came
+  from an outdated fixture, not from the Lua).
+
 ## 0.6.0 (22 Nov 2026, pre-release)
 
 - **Studio layout is always found.** The studio file is searched in `SCRIPTS:/studio/`, `SD:/scripts/studio/` and
