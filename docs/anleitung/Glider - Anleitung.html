@@ -48,7 +48,7 @@
 <body>
 
 <h1>Glider</h1>
-<div class="unter">Flug-Anzeige für Segler und E-Segler · Anleitung · Version 0.7.0 · Stand 22.11.2026</div>
+<div class="unter">Flug-Anzeige für Segler und E-Segler · Anleitung · Version 0.7.1 · Stand 24.11.2026</div>
 
 <div class="bild schmal">
   <img src="../bilder-simulator/Glider - Sim 800x480 04 Normal.png" alt="Glider auf dem Sender">
@@ -59,7 +59,7 @@ Bildschirm Vario, Höhe, Flugzeit, Akkus und Empfang, erkennt Start, Ausklinkhö
 kommt in eine Liste mit Übersicht, und du wirst gewarnt, wenn Höhe, Akku oder Empfang eine eingestellte Grenze verlassen.</p>
 
 <div class="kasten">
-  <b>Stand der Erprobung (Version 0.7.0):</b> Zufallstest und 37 Abläufe im Ethos-Simulator (X18RS, Ethos 26.2.0)
+  <b>Stand der Erprobung (Version 0.7.1):</b> Zufallstest und 37 Abläufe im Ethos-Simulator (X18RS, Ethos 26.2.0)
   fehlerfrei, auch Einstellungen und Flugliste nach einem Update. Vollbild 800 × 480 direkt getestet, 640 × 360, 480 × 320
   und 480 × 272 nachgestellt; Kompaktansicht 784 × 316 direkt, 630 × 258 und 472 × 210 nachgestellt.
   Am echten Sender (X18RS, Ethos 26.2.0): Start, drei Seiten und Ansagen (0.1.1), Sensorsuche mit 48 Sensoren und
@@ -73,7 +73,7 @@ kommt in eine Liste mit Übersicht, und du wirst gewarnt, wenn Höhe, Akku oder 
   <li>Ein Modell, bei dem die Telemetrie läuft und die Sensoren schon gesucht sind (Modell › Telemetrie › Sensoren suchen).</li>
   <li>Ein Vario mit Höhe und Steigen. Ohne Vario fehlen Flug, Ausklinkhöhe und Thermik.</li>
   <li>Einen Computer mit der FrSky Suite und ein USB-Kabel.</li>
-  <li>Die Datei <code>Glider-0.7.0.zip</code>. Sie liegt neben dieser Anleitung in <code>Glider-0.7.0-share.zip</code>. Entpacke nur die äussere ZIP, die innere nicht.</li>
+  <li>Die Datei <code>Glider-0.7.1.zip</code>. Sie liegt neben dieser Anleitung in <code>Glider-0.7.1-share.zip</code>. Entpacke nur die äussere ZIP, die innere nicht.</li>
 </ul>
 
 <h2>2. Installieren</h2>
@@ -82,7 +82,7 @@ kommt in eine Liste mit Übersicht, und du wirst gewarnt, wenn Höhe, Akku oder 
   <li>Am Sender erscheint eine Auswahl. Wähle <b>Ethos Suite</b>.</li>
   <li>Öffne am Computer die <b>FrSky Suite</b>. Der Sender wird oben angezeigt.</li>
   <li>Klicke auf <b>Lua-Bibliothek</b>, dann auf <b>Von lokaler ZIP installieren</b>.</li>
-  <li>Wähle die Datei <code>Glider-0.7.0.zip</code>. Die Suite kopiert alles in den Ordner <code>scripts/glider/</code> auf dem Sender.</li>
+  <li>Wähle die Datei <code>Glider-0.7.1.zip</code>. Die Suite kopiert alles in den Ordner <code>scripts/glider/</code> auf dem Sender.</li>
   <li>Ziehe das Kabel ab und starte den Sender neu.</li>
 </ol>
 <p class="klein">Ohne Suite: Sender als «USB-Speicher» anschliessen und den Ordner <code>glider</code> aus der ZIP in den
@@ -330,6 +330,7 @@ für dieses Modell gespeichert. «–» bei «Ab Werk» heisst: leer, wird gesuc
   <tr><td>Motor aus (Schalter)</td><td>– (sucht SF)</td><td>Schalter, der den Motor sperrt.</td></tr>
   <tr><td>Motor aus bei</td><td>oben</td><td>oben, Mitte, unten: Stellung, in der der Motor aus ist.</td></tr>
   <tr><td>Gas (Geber oder Kanal)</td><td>– (sucht S1)</td><td>Gasgeber oder Kanal.</td></tr>
+  <tr><td>Gas umkehren</td><td>aus</td><td>Für «Gas Reverse» (Vollgas = Knüppel hinten): Gas % = 100 − Gas %. Wirkt auf «Motor läuft», Flugstart und Motorlaufzeit.</td></tr>
   <tr><td>Motor läuft ab Gas</td><td>10 %</td><td>0 bis 100 %. Ab dieser Gasstellung gilt der Motor als laufend.</td></tr>
   <tr><td>Höchster Punkt nach Sinken</td><td>3 s</td><td>1 bis 10 s Sinken, bis der höchste Punkt als Ausklinkhöhe gilt.</td></tr>
   <tr><td rowspan="4">Flug erkennen</td><td>Flug beginnt ab Höhe</td><td>10 m</td><td>1 bis 100 m.</td></tr>
@@ -384,6 +385,7 @@ für dieses Modell gespeichert. «–» bei «Ab Werk» heisst: leer, wird gesuc
   <tr><td>Flugzeit läuft nicht, keine Flüge in der Liste</td><td>Höhe fehlt oder Flug kürzer als 30 s</td><td>Sensor «Höhe» prüfen; «Kürzere Flüge weglassen» kleiner stellen.</td></tr>
   <tr><td>Ausklinkhöhe bleibt «–»</td><td>Schalter nicht zugewiesen oder falsche Stellung</td><td>«Schleppkupplung» und «Ausgeklinkt bei» bzw. «Motor aus (Schalter)» prüfen.</td></tr>
   <tr><td>Motor zeigt nie «MOTOR LÄUFT»</td><td>Gas nicht zugewiesen («S1» nicht gefunden)</td><td>«Gas (Geber oder Kanal)» von Hand wählen.</td></tr>
+  <tr><td>«MOTOR LÄUFT» im Leerlauf, Flugzeit startet am Boden</td><td>Gas Reverse (Vollgas = Knüppel hinten)</td><td>Im Menü «Gas umkehren» einschalten.</td></tr>
   <tr><td>Bei Alarm nur ein Ton statt einer Stimme</td><td>Sprachdateien fehlen im Ordner <code>scripts/glider/audio/</code></td><td>Glider über die Suite neu installieren; das Paket enthält die Ansagen.</td></tr>
   <tr><td>Gar kein Ton bei Alarm</td><td>Ansagen aus oder Lautstärke 0 (der Stumm-Schalter lässt rote Alarme durch)</td><td>«Ton und Ansage bei Alarm» einschalten, Stumm-Schalter prüfen, Lautstärke am Sender prüfen.</td></tr>
   <tr><td>Auf dem Bildschirm steht «Feld zu klein»</td><td>Das Feld ist zu klein (Layout mit mehreren Feldern)</td><td>Layout <b>Vollbild</b> oder <b>ein Feld mit Kopf- und Fussleiste</b> wählen (Kapitel 3).</td></tr>
@@ -453,7 +455,7 @@ Glider zeigt dann die Standardanzeige. Datei neu übertragen, Ansicht ergänzen 
 <h3>Ein Layout für alle Modelle</h3>
 <p>Ein Layout für alle Modelle: Legt man <code>Standard.glider.lua</code> in <code>scripts/studio/</code>, nutzt jedes Modell ohne eigene Datei «Kennung.glider.lua» (Kennung = Modellname) und ohne Wahl im Menü dieses Layout. Reihenfolge: Wahl im Menü, Datei des Modells, <code>Standard.glider.lua</code>, eingebaute Anzeige. Änderungen am Sender bleiben je Modell. Ein Modell namens «Standard» nimmt seine eigene Datei. Im Menü «Studio-Layout» heisst der Eintrag «Standard (alle Modelle)».</p>
 
-<p class="klein">Glider Version 0.7.0 · 22.11.2026</p>
+<p class="klein">Glider Version 0.7.1 · 22.11.2026</p>
 
 </body>
 </html>

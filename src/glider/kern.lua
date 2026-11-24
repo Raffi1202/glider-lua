@@ -80,6 +80,13 @@ local function bereich(q)
 end
 
 -- Stellung einer Quelle in Prozent ihres Bereichs (Kanal, Geber).
+-- Gas in % (0 = Leerlauf, 100 = Vollgas). «Gas umkehren» (Gas Reverse, Vollgas = Knüppel hinten): 100 - Wert.
+local function gasProzent(c, p)
+  if p ~= nil and c.gasInv == true then return 100 - p end
+  return p
+end
+K._gasProzent = gasProzent      -- für test/gas-faelle.lua
+
 local function prozent(q)
   local v = zahl(q)
   if v == nil then return nil end
@@ -432,7 +439,7 @@ local function lesen(w)
   v.mah = t and zahl(c.aMah) or nil
   v.strom = t and zahl(c.aStrom) or nil
   -- Schalter und Geber (auch ohne Telemetrie)
-  v.gasP = prozent(c.gas)
+  v.gasP = gasProzent(c, prozent(c.gas))
   v.motorSw = c.swMotor and (stellung(c.swMotor) == c.motorPos) or nil
   v.ausgeklinkt = c.swSchlepp and (stellung(c.swSchlepp) == c.schleppPos) or nil
   v.sw1 = c.sw1 and aktiv(c.sw1, c.sw1Inv) or nil

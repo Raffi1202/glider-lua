@@ -15,3 +15,7 @@ All menu items with their defaults are listed in the manual, chapter 8: [Manual 
 
 ---
 [← Home](../Home.md) | [← Previous](Installation.md) | [Next →](Display.md)
+
+## Reverse throttle (from 0.7.1)
+
+If you fly "throttle reverse" (full throttle = stick back), switch on **Reverse throttle** in the widget menu, directly below the throttle source. Glider then uses throttle % = 100 − throttle % for "motor runs", flight start and motor run time. Off by default.

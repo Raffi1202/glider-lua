@@ -3,6 +3,15 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.7.1 (24 Nov 2026, pre-release)
+
+- **New setting "Reverse throttle"** (menu, directly below the throttle source; off by default). For pilots who fly
+  "throttle reverse" (full throttle = stick back): throttle % = 100 − throttle %. Applies wherever the throttle is used:
+  "motor runs", flight start and motor run time. Key `gasInv` (Lua-Studio `gas_inv`), stored at the end of the data
+  file; the widget storage is unchanged, updating from 0.7.0 keeps all settings with the new setting off.
+- Deutsch: Neue Einstellung «Gas umkehren» (Werk aus) für Gas Reverse, Vollgas = Knüppel hinten: Gas % = 100 − Gas %.
+  Wirkt auf «Motor läuft», Flugstart und Motorlaufzeit. Update von 0.7.0 behält alle Einstellungen.
+
 ## 0.7.0 (22 Nov 2026, pre-release)
 
 - **One layout for all models:** `Standard.glider.lua` (searched in the same three places) is used by every model that has

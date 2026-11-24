@@ -15,3 +15,7 @@ Alle Einstellungen mit Werkwerten: Anleitung Kapitel 8, [Anleitung (PDF)](../../
 
 ---
 [← Start](../Home.md) | [← Zurück](Installation.md) | [Weiter →](Anzeige.md)
+
+## Gas umkehren (ab 0.7.1)
+
+Wer «Gas Reverse» fliegt (Vollgas = Knüppel hinten), schaltet im Widget-Menü direkt unter dem Gasgeber **Gas umkehren** ein. Glider rechnet dann Gas % = 100 − Gas % für «Motor läuft», Flugstart und Motorlaufzeit. Ab Werk aus.

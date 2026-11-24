@@ -82,6 +82,7 @@ M.gruppen = {
     { "swMotor", "q", { "Motor aus (Schalter)", "Motor off (switch)" } },
     { "motorPos", "w", { "Motor aus bei", "Motor off at" }, 1, POS },
     { "gas", "q", { "Gas (Geber oder Kanal)", "Throttle (control/ch.)" } },
+    { "gasInv", "b", { "Gas umkehren", "Reverse throttle" }, false },          -- 0.7.1: Gas Reverse (Vollgas = Knüppel hinten)
     { "gasAb", "z", { "Motor läuft ab Gas", "Motor runs from throttle" }, 10, 0, 100, 0, " %" },
     { "sinkS", "z", { "Höchster Punkt nach Sinken", "Highest point after sink" }, 3, 1, 10, 0, " s" },
   } },
@@ -170,6 +171,7 @@ M.folge = {
   "ansage", "warnAnsage", "zahl", "vibration", "pause", "sperre",
   "sprache", "startSeite", "k1", "k2", "k3", "verlauf", "verlaufMin", "l1", "l2", "l3", "skala",
   "hMot", "pMot", "rMot", "z1Mot", "z2Mot", "z3Mot", "dMot",                     -- 0.4.0, Speicher-FORMAT 2
+  "gasInv",                                                                         -- 0.7.1 (nur Datei, Speicher unverändert)
 }
 
 -- Kennung des Speicherformats: erhöhen, wenn sich die Reihenfolge der Quellen in M.folge doch einmal ändert.
