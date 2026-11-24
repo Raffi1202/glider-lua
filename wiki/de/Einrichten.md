@@ -19,3 +19,7 @@ Alle Einstellungen mit Werkwerten: Anleitung Kapitel 8, [Anleitung (PDF)](../../
 ## Gas umkehren (ab 0.7.1)
 
 Wer «Gas Reverse» fliegt (Vollgas = Knüppel hinten), schaltet im Widget-Menü direkt unter dem Gasgeber **Gas umkehren** ein. Glider rechnet dann Gas % = 100 − Gas % für «Motor läuft», Flugstart und Motorlaufzeit. Ab Werk aus.
+
+## Zwei Bänder (TD-Empfänger, ab 0.7.2)
+
+Die Sensorsuche findet RSSI 900, VFR 2.4, VFR 900 und RX VFR über AppID und Band. Glider zeigt dann das bessere Band gross und beide darunter, warnt je Band (VFR unter 70 %) und alarmiert auf RX VFR unter 50 %.

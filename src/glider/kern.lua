@@ -209,6 +209,7 @@ local function grenzen(w)
   g.hWarn, g.hAlarm = gz("hWarn"), gz("hAlarm")
   g.pWarn, g.pAlarm = gz("pWarn"), gz("pAlarm")
   g.rssiWarn, g.rssiAlarm = gz("rssiWarn"), gz("rssiAlarm")
+  g.vfrW, g.vfrA = gz("vfrW"), gz("vfrA")                     -- 0.7.2: VFR Warnung je Band, RX VFR Alarm
   for i = 1, 3 do
     g["z" .. i .. "Warn"], g["z" .. i .. "Alarm"] = gz("z" .. i .. "Warn", 100), gz("z" .. i .. "Alarm", 100)
   end
@@ -254,6 +255,11 @@ local LUAWERT = {
   akku2_zelle = function(w) return zelle(w, 2) end,
   akku3_zelle = function(w) return zelle(w, 3) end,
   empfang = function(w) return w.v.rssi end,
+  rssi24 = function(w) return w.v.rssi24 end,
+  rssi900 = function(w) return w.v.rssi900 end,
+  vfr24 = function(w) return w.v.vfr24 end,
+  vfr900 = function(w) return w.v.vfr900 end,
+  rxvfr = function(w) return w.v.rxvfr end,
   speed = function(w) return w.v.speed end,
   strom = function(w) return w.v.strom end,
   verbrauch = function(w) return w.v.mah end,
@@ -466,6 +472,25 @@ local function lesen(w)
     end
     for _, k in ipairs(TEST.ohne or {}) do v[k] = nil end
   end
+  -- 0.7.2 (Issue #1): zwei Bänder (TD-Empfänger). v.rssi ist das bessere Band (Anzeige, bisherige Grenzen);
+  -- Warnung je Band, Alarm auf RX VFR, ohne RX VFR auf das bessere VFR. 0 beim zweiten Band = nicht vorhanden.
+  local band = c.rssi2 or c.vfr or c.vfr2 or c.rxvfr or (TEST and TEST.band)   -- ohne Band-Quellen nichts rechnen
+  local r9 = band and t and zahl(c.rssi2) or nil
+  if r9 == 0 then r9 = nil end
+  v.vfr24, v.vfr900, v.rxvfr = nil, nil, nil
+  if band and t then v.vfr24, v.vfr900, v.rxvfr = zahl(c.vfr), zahl(c.vfr2), zahl(c.rxvfr) end
+  if v.vfr900 == 0 and r9 == nil then v.vfr900 = nil end
+  if TEST and TEST.band then                        -- Testhaken: Werte beider Bänder vorgeben (Simulator ohne Telemetrie)
+    r9 = TEST.band.rssi900
+    for k, x in pairs(TEST.band) do v[k] = x end
+    if TEST.band.rssi24 then v.rssi = TEST.band.rssi24 end
+  end
+  v.zweiBand = (r9 ~= nil or v.vfr900 ~= nil) or nil
+  v.rssi900 = imBereich("rssi", r9)
+  v.rssi24 = v.zweiBand and imBereich("rssi", v.rssi) or nil
+  if v.rssi900 and (v.rssi == nil or v.rssi900 > v.rssi) then v.rssi = v.rssi900 end
+  v.vfr24, v.vfr900, v.rxvfr = imBereich("p", v.vfr24), imBereich("p", v.vfr900), imBereich("p", v.rxvfr)
+  v.vfrAlarm = v.rxvfr or ((v.vfr24 or v.vfr900) and max(v.vfr24 or -1, v.vfr900 or -1)) or nil
   v.h, v.vs, v.rssi, v.speed = imBereich("h", v.h), imBereich("vs", v.vs), imBereich("rssi", v.rssi), imBereich("speed", v.speed)
   v.pRegler, v.mah, v.strom = imBereich("p", v.pRegler), imBereich("mah", v.mah), imBereich("a", v.strom)
   -- Akku-% und Rollen
@@ -730,7 +755,7 @@ end
 
 local PAAR = { hW = "hA", pW = "pA", rW = "rA", z1W = "z1A", z2W = "z2A", z3W = "z3A" }
 -- Meldung -> Gruppe der eingebauten Grenzen in der Studio-Datei (Ansage/Vibration je Wert)
-local OPTGRUPPE = { hA = "h", hW = "h", rA = "r", rW = "r", z1A = "z1", z1W = "z1", z2A = "z2", z2W = "z2", z3A = "z3", z3W = "z3" }
+local OPTGRUPPE = { vfA = "r", b24W = "r", b9W = "r", hA = "h", hW = "h", rA = "r", rW = "r", z1A = "z1", z1W = "z1", z2A = "z2", z2W = "z2", z3A = "z3", z3W = "z3" }
 
 local function warnungen(w, now)
   local v, g, T, c = w.v, w.g, w.T, w.cfg
@@ -792,6 +817,20 @@ local function warnungen(w, now)
   if melde(w, now, "rA", 2, ra and not sR, T.empfangSchwach, "empfang_alarm", v.rssi and floor(v.rssi + 0.5), UNIT_PERCENT, 0) then st.rssi = 2
   elseif melde(w, now, "rW", 1, rw and not sR, T.empfangSchwach, "empfang_schwach", v.rssi and floor(v.rssi + 0.5), UNIT_PERCENT, 0) then st.rssi = 1
   elseif sR then st.rssi = farbe(ra, rw) end
+  -- 0.7.2: Alarm auf RX VFR (ohne RX VFR das bessere VFR); Warnung je Band (VFR, ohne VFR die RSSI-Warnung)
+  local fa = frei and g.vfrA and v.vfrAlarm and v.vfrAlarm < g.vfrA
+  if melde(w, now, "vfA", 2, fa and not sR, T.empfangSchwach, "empfang_alarm", v.vfrAlarm and floor(v.vfrAlarm + 0.5), UNIT_PERCENT, 0) then st.rssi = 2 end
+  if v.zweiBand then
+    local function schwach(rs, vf)
+      if vf then return g.vfrW ~= nil and vf < g.vfrW end
+      return g.rssiWarn ~= nil and rs ~= nil and rs < g.rssiWarn
+    end
+    local an = (w.meld.vfA and w.meld.vfA.an) or (w.meld.rA and w.meld.rA.an)
+    local w24 = frei and not an and not sR and schwach(v.rssi24, v.vfr24)
+    local w9 = frei and not an and not sR and schwach(v.rssi900, v.vfr900)
+    if melde(w, now, "b24W", 1, w24, T.empfang24, "empfang_24") and st.rssi == nil then st.rssi = 1 end
+    if melde(w, now, "b9W", 1, w9, T.empfang900, "empfang_900") and st.rssi == nil then st.rssi = 1 end
+  end
   STILL = false
   melde(w, now, "tele", 1, w.teleWar and not d, T.teleWeg, "telemetrie_weg")
 
@@ -1005,8 +1044,12 @@ local function schreibeDatei(w, now)
     w.schreibS = ok and 4 or 5
     if ok then return false end
   elseif s == 4 and w.schreibZ then
+    local ok = pcall(w.schreibF.zeilen, w, 5, w.schreibZ)          -- letztes Drittel der Einstellungen
+    w.schreibS = ok and 6 or 7
+    if ok then return false end
+  elseif s == 6 and w.schreibZ then
     local ok, text = pcall(w.schreibF.zeilen, w, 3, w.schreibZ)
-    w.schreibT, w.schreibS, w.schreibZ = ok and text or nil, 5, nil
+    w.schreibT, w.schreibS, w.schreibZ = ok and text or nil, 7, nil
     if ok then return false end
   end
   local okS, erfolg = false, false

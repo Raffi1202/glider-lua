@@ -3,6 +3,17 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.7.2 (24 Nov 2026, pre-release)
+
+- **Two bands (TD receivers, issue #1):** new sources RSSI 900 (2nd band), VFR 2.4, VFR 900 and RX VFR, found by the
+  search via AppID and the band of the source (not the name). The link shows the better band large and both bands
+  below ("2.4 / 900"). Warning per band (VFR below 70 %, without VFR the RSSI warning), alarm on RX VFR below 50 %
+  (without RX VFR on the better VFR). Voice "link 2.4 / link 900". One or two bands automatically.
+- Widget storage format 4 (new sources at the end); 0.7.1 and older are read without loss, the new sources start empty.
+  Writing the data file now takes thirds (command limit).
+- Deutsch: Zwei Bänder (TD-Empfänger, Issue #1): RSSI 900, VFR 2.4, VFR 900, RX VFR; besseres Band gross, beide darunter;
+  Warnung je Band (VFR 70 %), Alarm auf RX VFR (50 %). Update ohne Verlust, neue Quellen danach leer.
+
 ## 0.7.1 (24 Nov 2026, pre-release)
 
 - **New setting "Reverse throttle"** (menu, directly below the throttle source; off by default). For pilots who fly

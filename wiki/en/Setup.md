@@ -19,3 +19,7 @@ All menu items with their defaults are listed in the manual, chapter 8: [Manual 
 ## Reverse throttle (from 0.7.1)
 
 If you fly "throttle reverse" (full throttle = stick back), switch on **Reverse throttle** in the widget menu, directly below the throttle source. Glider then uses throttle % = 100 − throttle % for "motor runs", flight start and motor run time. Off by default.
+
+## Two bands (TD receivers, from 0.7.2)
+
+The sensor search finds RSSI 900, VFR 2.4, VFR 900 and RX VFR by AppID and band. Glider then shows the better band large and both below, warns per band (VFR below 70 %) and alarms on RX VFR below 50 %.

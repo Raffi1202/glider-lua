@@ -101,6 +101,10 @@ local function kachel(w, L, Z, typ, x, y, b, h)
   elseif typ == 6 then                                     -- Empfang
     Z.kasten(L, x, y, b, h, T.link, nil, st.rssi == 2 and C.rot or nil)
     Z.wert(L, cx, cy, v.rssi and string.format("%.0f %%", v.rssi), gross, farbe(Z, st.rssi), CENTERED, b - 24 * s)
+    if v.zweiBand then                                     -- 0.7.2: beide Bänder (besseres Band gross)
+      Z.zeile(L, x, z1, b, T.zweiBand, (v.rssi24 and string.format("%.0f", v.rssi24) or "-") .. " / " ..
+        (v.rssi900 and string.format("%.0f", v.rssi900) or "-") .. " %")
+    end
     Z.zeile(L, x, z2, b, T.tiefst, w.rssiMin and string.format("%.0f %%", w.rssiMin))
   elseif typ == 8 then                                     -- Höhengewinn Thermik
     local th = w.th

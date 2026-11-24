@@ -134,7 +134,7 @@ do
   for _, name in ipairs(F.folge) do local f = F.feld(name) if f and f[2] == "q" then q[#q + 1] = name end end
   local quelle = { name = function() return "SF" end, value = function() return 0 end }
   local mem = { fmt = 1, ende = 1 }
-  for i = 1, #q do mem["q" .. i] = quelle end
+  for i = 1, 17 do mem["q" .. i] = quelle end           -- FORMAT 1–3 hatten 17 Quellen (0.7.2: 4 neue am Ende)
   storage = { read = function(k) return mem[k] end, write = function(k, v) mem[k] = v end }
   model = { path = function() return "models/gibtsnicht_update.bin" end }
   local alt = io.open
@@ -142,12 +142,12 @@ do
   local wu = { name = "Segler" }
   local gef = F.lies(wu)
   local alle = true
-  for _, name in ipairs(q) do if wu.cfg[name] ~= quelle then alle = false end end
-  fall("j1) FORMAT 1 (0.3.x): alle " .. #q .. " Quellen gelesen", gef and alle)
+  for i, name in ipairs(q) do if (i <= 17 and wu.cfg[name] ~= quelle) or (i > 17 and wu.cfg[name] ~= nil) then alle = false end end
+  fall("j1) FORMAT 1 (0.3.x): alle 17 Quellen gelesen, die " .. (#q - 17) .. " neuen leer", gef and alle)
   fall("j2) neue Haken nach Update EIN", wu.cfg.hMot == true and wu.cfg.pMot == true and wu.cfg.rMot == true
     and wu.cfg.z1Mot == true and wu.cfg.z2Mot == true and wu.cfg.z3Mot == true and wu.cfg.dMot == true)
   F.schreibe(wu)
-  fall("j3) danach als FORMAT 3 geschrieben und wieder gelesen", mem.fmt == 3 and mem.ende == 3 and F.lies(wu) and wu.cfg[q[1]] == quelle)
+  fall("j3) danach als FORMAT " .. F.FORMAT .. " geschrieben und wieder gelesen", mem.fmt == F.FORMAT and mem.ende == F.FORMAT and F.lies(wu) and wu.cfg[q[1]] == quelle)
   fall("j4) Update: Studio-Wahl steht auf automatisch", wu.studioWahl == "" and mem.studio == "")
   wu.studioWahl = "SD:/scripts/studio/Falsch.glider.lua"
   F.schreibe(wu)

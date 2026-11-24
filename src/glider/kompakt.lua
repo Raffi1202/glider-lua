@@ -151,7 +151,8 @@ function K.zeichne(w, L, Z)
       a.summe and (Z.zahl(a.summe, 1) .. " V"), farbe(C, sa, C.text), a.p and a.p / 100 or 0, nil,
       farbe(C, sa, C.gruen), sa == 2 and C.rot or nil)
   else
-    ring(L, Z, 3 * gp + 2 * br, y1, br, hr, T.kLink, v.rssi and string.format("%.0f %%", v.rssi), nil,
+    ring(L, Z, 3 * gp + 2 * br, y1, br, hr, T.kLink, v.rssi and string.format("%.0f %%", v.rssi),
+      v.zweiBand and ((v.rssi24 and string.format("%.0f", v.rssi24) or "-") .. " / " .. (v.rssi900 and string.format("%.0f", v.rssi900) or "-")) or nil,
       farbe(C, st.rssi, C.text), v.rssi and v.rssi / 100 or 0, nil, farbe(C, st.rssi, C.gruen),
       st.rssi == 2 and C.rot or nil)
   end

@@ -16,6 +16,8 @@ fall("an: 30 % -> 70 %", g({ gasInv = true }, 30), 70)
 fall("an: kein Geber bleibt nil", g({ gasInv = true }, nil), nil)
 local F = assert(loadfile("felder.lua"))()
 fall("Werkwert aus", F.standard().gasInv, false)
-fall("Feld am Ende der Speicherreihenfolge", F.folge[#F.folge], "gasInv")
+local da = false
+for _, n in ipairs(F.folge) do if n == "gasInv" then da = true end end
+fall("Feld in der Speicherreihenfolge (Datei)", da, true)
 print(fehler == 0 and "ERGEBNIS: kein Fehler" or ("ERGEBNIS: " .. fehler .. " Fehler"))
 os.exit(fehler == 0 and 0 or 1)

@@ -35,6 +35,10 @@ M.gruppen = {
     { "hoehe", "q", { "Höhe", "Altitude" } },
     { "vario", "q", "Vario" },
     { "rssi", "q", { "Empfang (RSSI/LQ)", "Link (RSSI/LQ)" } },
+    { "rssi2", "q", { "RSSI 900 (2. Band)", "RSSI 900 (2nd band)" } },   -- 0.7.2 (Issue #1): TD-Empfänger, zwei Bänder
+    { "vfr", "q", "VFR 2.4" },
+    { "vfr2", "q", { "VFR 900 (2. Band)", "VFR 900 (2nd band)" } },
+    { "rxvfr", "q", "RX VFR" },
     { "speed", "q", { "Geschwindigkeit", "Speed" } },
   } },
   { { "Akkus", "Batteries" }, {
@@ -72,6 +76,8 @@ M.gruppen = {
     { "pAlarm", "z", { "Antrieb % Alarm unter", "Motor % alarm below" }, 20, 0, 100, 0, " %" },
     { "rssiWarn", "z", { "Empfang Warnung unter", "Link warning below" }, 0, 0, 100, 0 },
     { "rssiAlarm", "z", { "Empfang Alarm unter", "Link alarm below" }, 0, 0, 100, 0 },
+    { "vfrW", "z", { "VFR Warnung unter (je Band)", "VFR warning below (per band)" }, 70, 0, 100, 0, " %" },
+    { "vfrA", "z", { "RX VFR Alarm unter", "RX VFR alarm below" }, 50, 0, 100, 0, " %" },
   } },
   { { "Startart und Ausklinkhöhe", "Launch and release height" }, {
     { "akQuelle", "w", { "Ausklinkhöhe aus", "Release height from" }, 1,
@@ -172,14 +178,18 @@ M.folge = {
   "sprache", "startSeite", "k1", "k2", "k3", "verlauf", "verlaufMin", "l1", "l2", "l3", "skala",
   "hMot", "pMot", "rMot", "z1Mot", "z2Mot", "z3Mot", "dMot",                     -- 0.4.0, Speicher-FORMAT 2
   "gasInv",                                                                         -- 0.7.1 (nur Datei, Speicher unverändert)
+  "rssi2", "vfr", "vfr2", "rxvfr", "vfrW", "vfrA",   -- 0.7.2: Quellen ans Ende (Speicher-FORMAT 4), Schwellen in der Datei
 }
 
 -- Kennung des Speicherformats: erhöhen, wenn sich die Reihenfolge der Quellen in M.folge doch einmal ändert.
 -- 2 (0.4.0): «Alarm auch bei Motor aus» am Ende von M.folge. Die Quellen im Widget-Speicher sind unverändert, darum
 -- liest das Lua FORMAT 1 (0.3.x) weiter ohne Verlust; die neuen Ja/Nein-Werte stehen mit Namen in daten/ (fehlen = ja).
 -- 3 (0.6.0): Wahl «Studio-Layout» als Text NACH «ende» (Pfad oder ""). FORMAT 1/2 lesen weiter ohne Verlust, Wahl = auto.
-M.FORMAT = 3
-local FORMAT_ALT = { [1] = true, [2] = true, [3] = true }
+-- 4 (0.7.2): vier Quellen (RSSI 900, VFR 2.4, VFR 900, RX VFR) nach den bisherigen 17. FORMAT 1–3 liest das Lua mit
+-- 17 Quellen weiter ohne Verlust; die neuen sind danach leer.
+M.FORMAT = 4
+local FORMAT_ALT = { [1] = true, [2] = true, [3] = true, [4] = true }
+local Q_ALT = 17
 
 -- Feld zu einem Namen (Verzeichnis einmal aufbauen: Ethos begrenzt die Befehle je Aufruf).
 local INDEX = nil
@@ -346,7 +356,8 @@ function M.lies(w, nurDatei)
     local fmt = hol("fmt")
     if FORMAT_ALT[fmt] then
       local werte = {}
-      for i = 1, #q do werte[i] = hol("q" .. i) end
+      local nq = fmt <= 3 and Q_ALT or #q
+      for i = 1, nq do werte[i] = hol("q" .. i) end
       if hol("ende") == fmt then
         gefunden = true
         for i, name in ipairs(q) do c[name] = istQuelle(werte[i]) and werte[i] or nil end
@@ -410,8 +421,9 @@ function M.zeilen(w, teil, z)
   local c = w.cfg
   local n = #M.folge
   local von, bis = 1, n
-  if teil == 1 then bis = n // 2 elseif teil == 2 then von = n // 2 + 1 end
-  if teil ~= 2 then z = { "# " .. tostring(w.name) .. ": Einstellungen, Flugliste und laufender Flug dieses Modells" } end
+  if teil == 1 then bis = n // 3 elseif teil == 2 then von, bis = n // 3 + 1, 2 * n // 3
+  elseif teil == 5 then von = 2 * n // 3 + 1 end
+  if teil ~= 2 and teil ~= 5 then z = { "# " .. tostring(w.name) .. ": Einstellungen, Flugliste und laufender Flug dieses Modells" } end
   for i = von, bis do
     local name = M.folge[i]
     local f = M.feld(name)

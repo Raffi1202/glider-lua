@@ -152,6 +152,14 @@ local function lies(z)
     s.wert = type(v) == "number" and v == v and v > -1e7 and v < 1e7
     s.key = schluessel(z, s.id, s.teil, s.einheit)
     -- Betaflight/INAV melden über «Kraftstoff» (0x0600) die verbrauchten mAh: nach der Einheit trennen
+    -- 0.7.2 (Issue #1): RSSI/VFR des zweiten Bands (TD 900 MHz = Band 1, LoRa = Band 2) über band() der Quelle,
+    -- nicht über den Namen. Ohne band(): der zweite Sensor derselben Art ist das zweite Band.
+    if s.key == "rssi" or s.key == "vfr" then
+      local b = rufe(q, "band")
+      z.zahlB = z.zahlB or {}
+      z.zahlB[s.key] = (z.zahlB[s.key] or 0) + 1
+      if (type(b) == "number" and b ~= 0) or (b == nil and z.zahlB[s.key] > 1) then s.key = s.key .. "_b2" end
+    end
     if s.key == "kraftstoff" then
       if UNIT_MILLIAMPERE_HOUR and s.einheit == UNIT_MILLIAMPERE_HOUR then s.key = "kraftstoff_mah"
       elseif UNIT_PERCENT and s.einheit == UNIT_PERCENT then s.key = "kraftstoff_proz" end
@@ -190,6 +198,10 @@ local function weise(w, z)
     { "hoehe", { "hoehe", "rb35_hoehe", "d_hoehe", "gps_hoehe" } },
     { "vario", { "vario", "rb35_vario", "d_vario" } },
     { "rssi", { "rssi", "d_rssi" } },
+    { "rssi2", { "rssi_b2" } },
+    { "vfr", { "vfr" } },
+    { "vfr2", { "vfr_b2" } },
+    { "rxvfr", { "rx_vfr" } },
     { "speed", { "airspeed", "gps_speed" } },
     { z.empf, { "rx_batt", "rx_batt1", "adc2" } },
     { z.antr, { "zellen", "esc_u", "akku_u", "bat1_u", "d_akku_u" } },
