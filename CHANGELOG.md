@@ -3,6 +3,13 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.7.3 (24 Nov 2026, pre-release)
+
+- Lua-Studio value keys of the two bands renamed to match the other widgets: `lua:rssi_24`, `lua:rssi_900`, `lua:vfr_24`,
+  `lua:vfr_900`, `lua:rx_vfr` (were rssi24, rssi900, vfr24, vfr900, rxvfr). Nothing else changed.
+- Deutsch: Studio-Schlüssel der beiden Bänder wie bei den anderen Widgets umbenannt (rssi_24, rssi_900, vfr_24, vfr_900,
+  rx_vfr). Sonst keine Änderung.
+
 ## 0.7.2 (24 Nov 2026, pre-release)
 
 - **Two bands (TD receivers, issue #1):** new sources RSSI 900 (2nd band), VFR 2.4, VFR 900 and RX VFR, found by the

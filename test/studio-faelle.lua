@@ -427,6 +427,23 @@ do
   os.remove(ST)
 end
 
+-- 6f. Wert-Schlüssel der Bänder wie Electric (0.7.3): lua:rssi_24 … lua:rx_vfr werden gelesen
+do
+  loesche()
+  local pl = {}
+  for i, s in ipairs({ "rssi_24", "rssi_900", "vfr_24", "vfr_900", "rx_vfr" }) do
+    local function esc(x) return '"' .. x:gsub(".", function(ch) return "\\" .. ch:byte() end) .. '"' end
+    pl[#pl + 1] = string.format('{ x = %d, y = 41, b = 140, h = 60, w = %s, darstellung = %s }', 5 + (i - 1) * 150,
+      esc("lua:" .. s), esc("zahl"))
+  end
+  local g = io.open(S.PFAD .. KENNUNG .. ".glider.lua", "w")
+  g:write("return { format = 1, ansichten = { { breite = 784, hoehe = 316, plaetze = { " .. table.concat(pl, ", ") .. " } } } }")
+  g:close()
+  local wb = lauf()
+  fall("Band-Schlüssel wie Electric gelesen (5 Plätze, 0 Fehler)", wb.sd.status == "geladen" and wb.sd.fehler == 0
+    and #wb.sd.ansichten[1].plaetze == 5, tostring(wb.sd.fehler))
+end
+
 -- 7. Kennung (2.1)
 fall("Kennung nach 2.1", S.kennung("Extra 330 6S") == "Extra_330_6S" and S.kennung("Möwe") == "M__we"
   and S.kennung("Goblin 700 (neu)") == "Goblin_700__neu_" and S.kennung("") == "modell"

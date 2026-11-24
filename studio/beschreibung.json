@@ -1,6 +1,6 @@
 {
  "lua": "glider",
- "luaVersion": "0.7.2",
+ "luaVersion": "0.7.3",
  "beiMotorAus": true,
  "formate": [
   1
@@ -413,7 +413,7 @@
    "ansage": true
   },
   {
-   "s": "rssi24",
+   "s": "rssi_24",
    "name": {
     "de": "RSSI 2.4",
     "en": "RSSI 2.4"
@@ -431,7 +431,7 @@
    ]
   },
   {
-   "s": "rssi900",
+   "s": "rssi_900",
    "name": {
     "de": "RSSI 900",
     "en": "RSSI 900"
@@ -449,7 +449,7 @@
    ]
   },
   {
-   "s": "vfr24",
+   "s": "vfr_24",
    "name": {
     "de": "VFR 2.4",
     "en": "VFR 2.4"
@@ -467,7 +467,7 @@
    ]
   },
   {
-   "s": "vfr900",
+   "s": "vfr_900",
    "name": {
     "de": "VFR 900",
     "en": "VFR 900"
@@ -485,7 +485,7 @@
    ]
   },
   {
-   "s": "rxvfr",
+   "s": "rx_vfr",
    "name": {
     "de": "RX VFR",
     "en": "RX VFR"
