@@ -3,6 +3,11 @@
 The version number is in `src/glider/main.lua` (`local VERSION`). It is the same in the manual, the Suite package and here.
 The top section appears in the FrSky Suite as version note. From 0.4.0 on in English; older entries in German.
 
+## 0.7.4 (24 Nov 2026, pre-release)
+
+- Unit of the Lua-Studio values `rssi_24` and `rssi_900` is now dB, as in the other widgets. Deutsch: Einheit von
+  `rssi_24` und `rssi_900` jetzt dB wie bei den anderen Widgets.
+
 ## 0.7.3 (24 Nov 2026, pre-release)
 
 - Lua-Studio value keys of the two bands renamed to match the other widgets: `lua:rssi_24`, `lua:rssi_900`, `lua:vfr_24`,

@@ -3,7 +3,7 @@
 -- Für ein neues Lua ändern sich hier nur die vier Zeilen NAME, KEY, VERSION und INFO.
 local NAME = "Glider"     -- Anzeigename in Ethos und Vorsatz aller Meldungen
 local KEY = "glider"       -- Schlüssel des Widgets: kurz, klein, eindeutig; nach der ersten Abgabe nie mehr ändern
-local VERSION = "0.7.3"    -- die Versionsnummer steht nur hier (x.y.z); das Suite-Paket liest sie von hier
+local VERSION = "0.7.4"    -- die Versionsnummer steht nur hier (x.y.z); das Suite-Paket liest sie von hier
 local INFO = "Glider: vario, altitude, flight time, release height, thermal hint, batteries and flight list for gliders and electric gliders."   -- ein Satz für die FrSky Suite
 local gemeldet = {}
 
