@@ -2,6 +2,10 @@
 
 **English** · [Deutsch](README.de.md) · Documentation: [Wiki (English)](wiki/en/Installation.md) · [Wiki (Deutsch)](wiki/de/Installation.md)
 
+This project is open source and free. If you like it, you can support it with a donation:
+
+<a href="https://paypal.me/RaphaelHunziker"><img src=".github/paypal-donate.png" alt="Donate with PayPal" width="200"></a>
+
 > **Configure on your PC with [Lua-Studio](https://github.com/Raffi1202/lua-studio)** – arrange the screen, choose values, alarms and symbols, then transfer to the radio. Download: [latest release](https://github.com/Raffi1202/lua-studio/releases/latest) · [Wiki](https://github.com/Raffi1202/lua-studio/tree/main/wiki)
 
 **Glider** is an Ethos widget (full screen or compact view with the Ethos bars) for gliders and electric gliders on FrSky
@@ -81,12 +85,6 @@ luac -p src/glider/*.lua
 
 The flows `test/*.json` are meant for a simulator driver based on the Ethos WASM simulator ("ethos-tools" plugin); that
 driver, the random test and the PDF/package scripts belong to the author's build kit and are not part of this repo.
-
-## Support
-
-This project is free. If you would like to support the work, you can do so via PayPal: https://paypal.me/RaphaelHunziker. Thank you!
-
-[![Donate with PayPal](https://img.shields.io/badge/PayPal-Donate-003087?logo=paypal&logoColor=white)](https://paypal.me/RaphaelHunziker)
 
 ## License
 

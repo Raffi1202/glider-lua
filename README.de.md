@@ -2,6 +2,10 @@
 
 [English](README.md) · **Deutsch** · Dokumentation: [Wiki (Deutsch)](wiki/de/Installation.md) · [Wiki (English)](wiki/en/Installation.md)
 
+Dieses Projekt ist Open Source und kostenlos. Wenn es dir gefällt, kannst du es mit einer Spende unterstützen:
+
+<a href="https://paypal.me/RaphaelHunziker"><img src=".github/paypal-spenden.png" alt="Spenden mit PayPal" width="200"></a>
+
 > **Am PC einrichten mit [Lua-Studio](https://github.com/Raffi1202/lua-studio)**: Bildschirm einteilen, Werte, Alarme und Symbole wählen, auf die Funke übertragen.
 
 **Glider** ist ein Ethos-Widget (Vollbild oder Kompaktansicht mit den Ethos-Leisten) für Segler und E-Segler auf
@@ -80,12 +84,6 @@ es nur im Vollbild. Der Gasgeber wird als «S1» gesucht; bei manchen Sendern im
 | Texte aller Sprachansagen | `docs/Sprachansagen.md` |
 | Abläufe für den Simulator, feste Testfälle | `test/` |
 | Beschreibung für Lua-Studio, Beispiel-Datei | `studio/` |
-
-## Unterstützen
-
-Dieses Projekt ist kostenlos. Wer die Arbeit unterstützen möchte, kann das über PayPal tun: https://paypal.me/RaphaelHunziker. Vielen Dank!
-
-[![Spenden mit PayPal](https://img.shields.io/badge/PayPal-Spenden-003087?logo=paypal&logoColor=white)](https://paypal.me/RaphaelHunziker)
 
 ## Lizenz
 
