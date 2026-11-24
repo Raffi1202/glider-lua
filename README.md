@@ -86,6 +86,8 @@ driver, the random test and the PDF/package scripts belong to the author's build
 
 This project is free. If you would like to support the work, you can do so via PayPal: https://paypal.me/RaphaelHunziker. Thank you!
 
+[![Donate with PayPal](https://img.shields.io/badge/PayPal-Donate-003087?logo=paypal&logoColor=white)](https://paypal.me/RaphaelHunziker)
+
 ## License
 
 GPL-3.0, see [LICENSE](LICENSE).
