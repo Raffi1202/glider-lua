@@ -82,6 +82,10 @@ luac -p src/glider/*.lua
 The flows `test/*.json` are meant for a simulator driver based on the Ethos WASM simulator ("ethos-tools" plugin); that
 driver, the random test and the PDF/package scripts belong to the author's build kit and are not part of this repo.
 
+## Support
+
+This project is free. If you would like to support the work, you can do so via PayPal: https://paypal.me/Raffi1202. Thank you!
+
 ## License
 
 GPL-3.0, see [LICENSE](LICENSE).

@@ -81,6 +81,10 @@ es nur im Vollbild. Der Gasgeber wird als «S1» gesucht; bei manchen Sendern im
 | Abläufe für den Simulator, feste Testfälle | `test/` |
 | Beschreibung für Lua-Studio, Beispiel-Datei | `studio/` |
 
+## Unterstützen
+
+Dieses Projekt ist kostenlos. Wer die Arbeit unterstützen möchte, kann das über PayPal tun: https://paypal.me/Raffi1202. Vielen Dank!
+
 ## Lizenz
 
 GPL-3.0, siehe [LICENSE](LICENSE).
